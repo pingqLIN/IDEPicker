@@ -1,0 +1,280 @@
+/* VS Code IDE Switcher - Modern Dark Theme */
+
+/* Google Fonts - Inter */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap");
+
+:root {
+  /* Default to Light Mode */
+  /* Color Palette */
+  --bg-primary: #ffffff;
+  --bg-card: #f3f4f6;
+  --bg-card-hover: #e5e7eb;
+  --bg-selected: rgba(66, 133, 244, 0.1);
+
+  /* Gradient - Light Mode 稍微淡一點 */
+  --gradient-primary: linear-gradient(135deg, #1a73e8 0%, #7b1fa2 100%);
+  --gradient-glow: linear-gradient(
+    135deg,
+    rgba(26, 115, 232, 0.2) 0%,
+    rgba(123, 31, 162, 0.2) 100%
+  );
+
+  /* Text - High Contrast */
+  --text-primary: #1f2937;
+  --text-secondary: #4b5563;
+  --text-muted: #6b7280;
+  --text-warning: #4b5563; /* Footer text specific */
+
+  /* Border & Effects */
+  --border-color: #e5e7eb;
+  --border-hover: rgba(66, 133, 244, 0.5);
+  --border-selected: #1a73e8;
+
+  /* Status */
+  --success-color: #059669;
+
+  /* Dimensions */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+}
+
+/* Dark Mode Override */
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Color Palette - 調亮背景色增強對比 */
+    --bg-primary: #1e1e2e;
+    --bg-card: #2a2a3e;
+    --bg-card-hover: #3a3a52;
+    --bg-selected: rgba(66, 133, 244, 0.25);
+
+    /* Gradient */
+    --gradient-primary: linear-gradient(135deg, #4285f4 0%, #7b1fa2 100%);
+    --gradient-glow: linear-gradient(
+      135deg,
+      rgba(66, 133, 244, 0.3) 0%,
+      rgba(123, 31, 162, 0.3) 100%
+    );
+
+    /* Text */
+    --text-primary: #ffffff;
+    --text-secondary: #b0bec5;
+    --text-muted: #94a3b8;
+    --text-warning: #9ca3af; /* Lighter for dark mode footer */
+
+    /* Border & Effects - 增強邊框可見度 */
+    --border-color: rgba(255, 255, 255, 0.12);
+    --border-hover: rgba(66, 133, 244, 0.6);
+    --border-selected: rgba(66, 133, 244, 1);
+
+    /* Status */
+    --success-color: #10b981;
+  }
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family:
+    "Inter",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  background: var(--bg-primary);
+  min-width: 240px;
+  max-width: 260px;
+  color: var(--text-primary);
+}
+
+.container {
+  padding: 14px 16px;
+}
+
+/* Header */
+.header {
+  margin-bottom: 12px;
+}
+
+/* Title removed */
+
+.subtitle {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+/* IDE List */
+.ide-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* IDE Option Card */
+.ide-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  background: var(--bg-card);
+  border: 1.2px solid var(--border-color);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.ide-option::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--gradient-glow);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.ide-option:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--border-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px rgba(66, 133, 244, 0.15);
+}
+
+.ide-option:hover::before {
+  opacity: 0.3;
+}
+
+.ide-option.selected {
+  background: var(--bg-selected);
+  border-color: var(--border-selected);
+  box-shadow: 0 2px 6px rgba(66, 133, 244, 0.2);
+}
+
+.ide-option.selected::before {
+  opacity: 0.4;
+}
+
+/* IDE Icon */
+.ide-icon {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.ide-icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* IDE Info */
+.ide-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  position: relative;
+  z-index: 1;
+}
+
+.ide-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+/* Check Icon */
+.check-icon {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: scale(0.8);
+  transition: all 0.2s ease;
+  position: relative;
+  z-index: 1;
+}
+
+.check-icon svg {
+  width: 14px;
+  height: 14px;
+  color: var(--success-color);
+}
+
+.ide-option.selected .check-icon {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Footer */
+.footer {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center; /* 改為居中 */
+}
+
+.warning-text {
+  font-size: 10px;
+  color: var(--text-warning); /* 使用專為可讀性設計的變數 */
+  opacity: 1; /* 移除透明度以確保清晰 */
+  text-align: center;
+  width: 100%;
+}
+
+/* Animation */
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.ide-option.just-selected {
+  animation: pulse 0.25s ease;
+}
+
+/* Accessibility */
+.ide-option:focus {
+  outline: 2px solid var(--border-selected);
+  outline-offset: 2px;
+}
+
+.ide-option:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .ide-option,
+  .check-icon,
+  .ide-option::before {
+    transition: none;
+  }
+
+  .ide-option.just-selected {
+    animation: none;
+  }
+}
