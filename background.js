@@ -41,17 +41,10 @@ async function createContextMenus() {
     });
 
     // ============ IDE 選擇選單 ============
-    chrome.contextMenus.create({
-      id: "ide-switcher-parent",
-      title: chrome.i18n.getMessage("menuSelectIde"),
-      contexts: ["page", "link", "selection"],
-    });
-
-    // 建立各 IDE 選項
+    // 建立各 IDE 選項 (直接在第一層)
     IDE_OPTIONS.forEach((ide) => {
       chrome.contextMenus.create({
         id: `ide-${ide.id}`,
-        parentId: "ide-switcher-parent",
         title: ide.name,
         type: "radio",
         contexts: ["page", "link", "selection"],
