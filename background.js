@@ -1,13 +1,13 @@
-const STORAGE_KEY = "selectedProtocol";
-const DEFAULT_PROTOCOL = "antigraavity";
+const STORAGE_KEY = 'selectedProtocol';
+const DEFAULT_PROTOCOL = 'antigraavity';
 
 // IDE 選項配置
 const IDE_OPTIONS = [
-  { id: "vscode", name: "VS Code", desc: "Official stable" },
-  { id: "vscode-insiders", name: "VS Code Insiders", desc: "Preview release" },
-  { id: "antigraavity", name: "Antigravity", desc: "Antigravity IDE" },
-  { id: "cursor", name: "Cursor", desc: "AI-first IDE" },
-  { id: "windsurf", name: "Windsurf", desc: "Codeium IDE" },
+  { id: 'vscode', name: 'VS Code', desc: 'Official stable' },
+  { id: 'vscode-insiders', name: 'VS Code Insiders', desc: 'Preview release' },
+  { id: 'antigraavity', name: 'Antigravity', desc: 'Antigravity IDE' },
+  { id: 'cursor', name: 'Cursor', desc: 'AI-first IDE' },
+  { id: 'windsurf', name: 'Windsurf', desc: 'Codeium IDE' },
 ];
 
 // 舊協議 ID 到新協議 ID 的映射（用於遷移）
@@ -43,9 +43,9 @@ async function getCurrentIDEName() {
     const result = await chrome.storage.sync.get(STORAGE_KEY);
     const currentProtocol = result[STORAGE_KEY] || DEFAULT_PROTOCOL;
     const ide = IDE_OPTIONS.find(i => i.id === currentProtocol);
-    return ide ? ide.name : "IDE";
+    return ide ? ide.name : 'IDE';
   } catch {
-    return "IDE";
+    return 'IDE';
   }
 }
 
@@ -59,27 +59,27 @@ async function createContextMenus() {
   chrome.contextMenus.removeAll(() => {
     // ============ VSIX 連結專用選單 ============
     chrome.contextMenus.create({
-      id: "install-vsix",
-      title: chrome.i18n.getMessage("menuInstallVsix", [ideName]),
-      contexts: ["link"],
-      targetUrlPatterns: ["*://*/*.vsix", "*://*/*.vsix?*"]
+      id: 'install-vsix',
+      title: chrome.i18n.getMessage('menuInstallVsix', [ideName]),
+      contexts: ['link'],
+      targetUrlPatterns: ['*://*/*.vsix', '*://*/*.vsix?*']
     });
 
     // ============ IDE 選擇選單 ============
     chrome.contextMenus.create({
-      id: "ide-switcher-parent",
-      title: chrome.i18n.getMessage("menuSelectIde"),
-      contexts: ["page", "link", "selection"],
+      id: 'ide-switcher-parent',
+      title: chrome.i18n.getMessage('menuSelectIde'),
+      contexts: ['page', 'link', 'selection'],
     });
 
     // 建立各 IDE 選項
     IDE_OPTIONS.forEach((ide) => {
       chrome.contextMenus.create({
         id: `ide-${ide.id}`,
-        parentId: "ide-switcher-parent",
+        parentId: 'ide-switcher-parent',
         title: ide.name,
-        type: "radio",
-        contexts: ["page", "link", "selection"],
+        type: 'radio',
+        contexts: ['page', 'link', 'selection'],
       });
     });
 
@@ -95,11 +95,11 @@ async function updateMenuCheckState() {
   try {
     const result = await chrome.storage.sync.get(STORAGE_KEY);
     const currentProtocol = result[STORAGE_KEY] || DEFAULT_PROTOCOL;
-    const ideName = IDE_OPTIONS.find(i => i.id === currentProtocol)?.name || "IDE";
+    const ideName = IDE_OPTIONS.find(i => i.id === currentProtocol)?.name || 'IDE';
 
     // 更新 VSIX 安裝選單標題
-    chrome.contextMenus.update("install-vsix", {
-      title: chrome.i18n.getMessage("menuInstallVsix", [ideName])
+    chrome.contextMenus.update('install-vsix', {
+      title: chrome.i18n.getMessage('menuInstallVsix', [ideName])
     });
 
     // 更新 radio 狀態
@@ -109,7 +109,7 @@ async function updateMenuCheckState() {
       });
     });
   } catch (error) {
-    console.error("[IDE Switcher] Failed to update menu state:", error);
+    console.error('[IDE Switcher] Failed to update menu state:', error);
   }
 }
 
@@ -153,7 +153,7 @@ async function handleMenuClick(info, tab) {
   const menuId = info.menuItemId;
 
   // 處理 VSIX 安裝
-  if (menuId === "install-vsix" && info.linkUrl) {
+  if (menuId === 'install-vsix' && info.linkUrl) {
     const result = await chrome.storage.sync.get(STORAGE_KEY);
     const protocol = result[STORAGE_KEY] || DEFAULT_PROTOCOL;
 
@@ -165,14 +165,14 @@ async function handleMenuClick(info, tab) {
       // 在目前分頁觸發協議
       chrome.tabs.update(tab.id, { url: protocolUrl });
     } else {
-      console.warn("[IDE Switcher] Unable to parse extension info:", info.linkUrl);
+      console.warn('[IDE Switcher] Unable to parse extension info:', info.linkUrl);
     }
     return;
   }
 
   // 處理 IDE 選擇
-  if (menuId.startsWith("ide-")) {
-    const protocol = menuId.replace("ide-", "");
+  if (menuId.startsWith('ide-')) {
+    const protocol = menuId.replace('ide-', '');
 
     try {
       await chrome.storage.sync.set({ [STORAGE_KEY]: protocol });
@@ -181,14 +181,14 @@ async function handleMenuClick(info, tab) {
       // 更新選單狀態
       await updateMenuCheckState();
     } catch (error) {
-      console.error("[IDE Switcher] Failed to save settings:", error);
+      console.error('[IDE Switcher] Failed to save settings:', error);
     }
   }
 }
 
 // 監聽擴充功能安裝/更新
 chrome.runtime.onInstalled.addListener(async () => {
-  console.log("[IDE Switcher] Extension installed/updated");
+  console.log('[IDE Switcher] Extension installed/updated');
   // 先執行遷移（處理舊的 antigravity -> antigraavity）
   await migrateProtocolIfNeeded();
   createContextMenus();
@@ -199,7 +199,7 @@ chrome.contextMenus.onClicked.addListener(handleMenuClick);
 
 // 監聽設定變更（同步選單狀態）
 chrome.storage.onChanged.addListener((changes, areaName) => {
-  if (areaName === "sync" && changes[STORAGE_KEY]) {
+  if (areaName === 'sync' && changes[STORAGE_KEY]) {
     updateMenuCheckState();
   }
 });

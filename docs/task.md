@@ -12,7 +12,7 @@
 | ---------------- | -------------------- |
 | VS Code          | `vscode://`          |
 | VS Code Insiders | `vscode-insiders://` |
-| Antigravity      | `antigravity://`     |
+| Antigravity      | `antigraavity://`    |
 | Cursor           | `cursor://`          |
 | Windsurf         | `windsurf://`        |
 

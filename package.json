@@ -1,1 +1,26 @@
-{"name":"ide-link-interceptor","version":"1.3.0","description":"Browser extension that intercepts IDE hyperlinks and lets you choose which IDE to open them with","scripts":{"lint":"eslint *.js","lint:fix":"eslint *.js --fix","package":"node scripts/package.js","validate":"node scripts/validate-manifest.js"},"keywords":["chrome-extension","browser-extension","ide","link-interceptor","vscode","cursor","windsurf"],"author":"pingqLIN","license":"MIT","devDependencies":{"archiver":"^7.0.1","eslint":"^8.57.0"}}
+{
+    "name": "ide-link-interceptor",
+    "version": "1.4.0",
+    "description": "Browser extension that intercepts IDE hyperlinks and lets you choose which IDE to open them with",
+    "scripts": {
+        "lint": "eslint *.js",
+        "lint:fix": "eslint *.js --fix",
+        "package": "node scripts/package.js",
+        "validate": "node scripts/validate-manifest.js"
+    },
+    "keywords": [
+        "chrome-extension",
+        "browser-extension",
+        "ide",
+        "link-interceptor",
+        "vscode",
+        "cursor",
+        "windsurf"
+    ],
+    "author": "pingqLIN",
+    "license": "MIT",
+    "devDependencies": {
+        "archiver": "^7.0.1",
+        "eslint": "^8.57.0"
+    }
+}

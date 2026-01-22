@@ -16,7 +16,7 @@
 | ---------------- | -------------------- | ---- |
 | VS Code          | `vscode://`          | 💙   |
 | VS Code Insiders | `vscode-insiders://` | 💚   |
-| Antigravity      | `antigravity://`     | 🚀   |
+| Antigravity      | `antigraavity://`    | 🚀   |
 | Cursor           | `cursor://`          | ⚡   |
 | Windsurf         | `windsurf://`        | 🌊   |
 
@@ -45,6 +45,7 @@ vscode-antigravity-linker/
 2. 開啟右上角「**開發人員模式**」
 3. 點擊「**載入未封裝項目**」
 4. 選擇資料夾：
+
    ```
    c:\Users\addra\.gemini\antigravity\playground\crystal-astro\vscode-antigravity-linker
    ```

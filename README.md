@@ -18,27 +18,21 @@ A browser extension that intercepts IDE hyperlinks (`vscode://`, `cursor://`, `w
 
 ### Popup Interface
 
-<p align="center">
-  <img src="docs/screenshot-popup.png" alt="Popup Interface" width="300"/>
-</p>
+![Popup Interface](docs/screenshot-popup.png)
 
-_Click the extension icon to select your preferred IDE_
+**Click the extension icon to select your preferred IDE**
 
 ### Context Menu Integration
 
-<p align="center">
-  <img src="docs/screenshot-context-menu.png" alt="Context Menu" width="650"/>
-</p>
+![Context Menu](docs/screenshot-context-menu.png)
 
-_Right-click on any link to choose your target IDE_
+**Right-click on any link to choose your target IDE**
 
 ### Before: Browser Protocol Prompt
 
-<p align="center">
-  <img src="docs/screenshot-intercept.png" alt="Protocol Interception" width="650"/>
-</p>
+![Protocol Interception](docs/screenshot-intercept.png)
 
-_Without the extension: annoying browser prompts every time_
+**Without the extension: annoying browser prompts every time**
 
 ## 🎯 Supported IDEs
 
@@ -185,4 +179,4 @@ This extension was created to streamline the workflow of developers who use mult
 
 ---
 
-<p align="center">Made with ❤️ by <a href="https://github.com/pingqLIN">pingqLIN</a></p>
+Made with ❤️ by [pingqLIN](https://github.com/pingqLIN)

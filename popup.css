@@ -278,3 +278,12 @@ body {
     animation: none;
   }
 }
+
+/* SVG Gradient Stops */
+.gradient-stop-start {
+  stop-color: #4285f4;
+}
+
+.gradient-stop-end {
+  stop-color: #7b1fa2;
+}

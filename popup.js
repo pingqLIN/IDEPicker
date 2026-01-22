@@ -108,7 +108,7 @@
     const warningEl = document.getElementById('warning-msg');
     if (!warningEl) return;
 
-    warningEl.textContent = chrome.i18n.getMessage("warningNotInstalled");
+    warningEl.textContent = chrome.i18n.getMessage('warningNotInstalled');
   }
 
   /**
