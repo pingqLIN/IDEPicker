@@ -1,8 +1,29 @@
 # IDE Link Interceptor
 
-[中文版](README.zh-TW.md)
+<div align="center">
 
-[![CI](https://github.com/pingqLIN/vscode-antigravity-linker/actions/workflows/ci.yml/badge.svg)](https://github.com/pingqLIN/vscode-antigravity-linker/actions/workflows/ci.yml)
+[![CI](https://github.com/pingqLIN/IDE-Link-Interceptor/actions/workflows/ci.yml/badge.svg)](https://github.com/pingqLIN/IDE-Link-Interceptor/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+**Intercept IDE protocol links and choose your preferred editor seamlessly.**
+
+[中文版](README.zh-TW.md) | [Report Bug](https://github.com/pingqLIN/IDE-Link-Interceptor/issues) | [Request Feature](https://github.com/pingqLIN/IDE-Link-Interceptor/issues)
+
+</div>
+
+---
+
+## 📖 Table of Contents
+
+- [Features](#-features)
+- [Screenshots](#-screenshots)
+- [Supported IDEs](#-supported-ides)
+- [Installation](#-installation)
+- [Usage](#-usage)
+- [Testing](#-testing)
+- [Development](#-development)
+
+---
 
 A browser extension that intercepts IDE hyperlinks (`vscode://`, `cursor://`, `windsurf://`) from web pages and lets you choose which IDE to open them with.
 
@@ -16,33 +37,28 @@ A browser extension that intercepts IDE hyperlinks (`vscode://`, `cursor://`, `w
 
 ## 📸 Screenshots
 
-### Popup Interface
-
-![Popup Interface](docs/screenshot-popup.png)
-
-**Click the extension icon to select your preferred IDE**
-
-### Context Menu Integration
-
-![Context Menu](docs/screenshot-context-menu.png)
-
-**Right-click on any link to choose your target IDE**
+| Popup Interface | Context Menu |
+|:---:|:---:|
+| ![Popup Interface](docs/screenshot-popup.png) | ![Context Menu](docs/screenshot-context-menu.png) |
+| *Click extension icon to select IDE* | *Right-click to open specific links* |
 
 ### Before: Browser Protocol Prompt
 
-![Protocol Interception](docs/screenshot-intercept.png)
-
-**Without the extension: annoying browser prompts every time**
+<div align="center">
+  <img src="docs/screenshot-intercept.png" alt="Protocol Interception" width="600"/>
+  <br/>
+  <em>Without the extension: annoying browser prompts every time</em>
+</div>
 
 ## 🎯 Supported IDEs
 
-| IDE              | Protocol             | Description     |
-| ---------------- | -------------------- | --------------- |
-| VS Code          | `vscode://`          | Official stable |
-| VS Code Insiders | `vscode-insiders://` | Preview release |
-| Antigravity      | `antigraavity://`    | Antigravity IDE |
-| Cursor           | `cursor://`          | AI-first IDE    |
-| Windsurf         | `windsurf://`        | Codeium IDE     |
+| IDE | Protocol | Description |
+| :--- | :--- | :--- |
+| **VS Code** | `vscode://` | Official stable release |
+| **VS Code Insiders** | `vscode-insiders://` | Preview release |
+| **Antigravity** | `antigraavity://` | Antigravity IDE |
+| **Cursor** | `cursor://` | AI-first IDE |
+| **Windsurf** | `windsurf://` | Codeium IDE |
 
 ## 📦 Installation
 
@@ -71,23 +87,23 @@ npm run validate
 
 ### Method 1: Extension Popup
 
-1. Click the extension icon in the browser toolbar
-2. Select your target IDE from the list
-3. Your choice is automatically saved
+1. Click the extension icon in the browser toolbar.
+2. Select your target IDE from the list.
+3. Your choice is automatically saved.
 
 ### Method 2: Context Menu
 
-1. Right-click on any link or page
-2. Hover over "🔗 Select Target IDE" (or "🔗 選擇目標 IDE" in Chinese)
-3. Select your preferred IDE
+1. Right-click on any link or page.
+2. Hover over "**🔗 Select Target IDE**".
+3. Select your preferred IDE.
 
 > **Note:** The extension automatically displays menu text in English or Traditional Chinese based on your browser's language settings.
 
 ### Method 3: VSIX Files
 
-1. Right-click on a `.vsix` download link
-2. Click "📦 Install extension with \[IDE Name\]"
-3. The extension will be installed in your chosen IDE
+1. Right-click on a `.vsix` download link.
+2. Click "**📦 Install extension with \[IDE Name\]**".
+3. The extension will be installed in your chosen IDE.
 
 ## 🧪 Testing
 
@@ -97,23 +113,9 @@ Try these websites to test the extension:
 - [VS Code Marketplace](https://marketplace.visualstudio.com/) - Click extension "Install" buttons
 - [Open VSX Registry](https://open-vsx.org/) - Download `.vsix` files
 
-## 📁 File Structure
-
-```text
-ide-link-interceptor/
-├── manifest.json    # Extension configuration
-├── content.js       # Link interception script
-├── popup.html       # Popup interface
-├── popup.css        # Popup styles
-├── popup.js         # Popup logic
-├── background.js    # Background service worker
-├── icons/           # Extension icons
-└── docs/            # Development documentation
-```
-
 ## 🛠️ Development
 
-### Setting up the Development Environment
+### Setting up Environment
 
 ```bash
 # Install dependencies
@@ -138,32 +140,27 @@ This project uses GitHub Actions for automated builds and deployment:
 
 #### CI Workflow (on every Push and PR)
 
-1. **Code Linting** - Use ESLint to check code quality
-2. **Manifest Validation** - Validate manifest.json structure and file integrity
-3. **Packaging** - Automatically package the extension as a `.zip` file
-4. **Upload Artifacts** - Upload the packaged file to GitHub Actions artifacts
+1. **Code Linting** - ESLint quality check
+2. **Manifest Validation** - Integrity check
+3. **Packaging** - Zip creation
+4. **Upload Artifacts** - Build preservation
 
-#### Release Workflow (when pushing version tags)
+#### Release Workflow (on tag push)
 
 When pushing a version tag (e.g., `v1.3.0`):
 
 1. Run all CI checks
 2. Package the extension
-3. Automatically create a GitHub Release
-4. Attach the packaged file to the Release
+3. Automatically create a GitHub Release with the package
 
-**Creating a new release:**
+### Creating a Release
 
 ```bash
-# Make sure the version number in manifest.json is updated
-git tag v1.3.0
-git push origin v1.3.0
+# 1. Update version in manifest.json & package.json
+# 2. Tag and push
+git tag v1.4.0
+git push origin v1.4.0
 ```
-
-### Workflow Files
-
-- `.github/workflows/ci.yml` - Continuous integration workflow
-- `.github/workflows/release.yml` - Automated release workflow
 
 ## 🤝 Contributing
 
@@ -171,12 +168,8 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 📄 License
 
-MIT
+Distributed under the MIT License. See `LICENSE` for more information.
 
 ## 🙏 Acknowledgments
-
-This extension was created to streamline the workflow of developers who use multiple IDE variants and want seamless control over protocol link handling.
-
----
 
 Made with ❤️ by [pingqLIN](https://github.com/pingqLIN)
