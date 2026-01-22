@@ -1,11 +1,11 @@
 const STORAGE_KEY = "selectedProtocol";
-const DEFAULT_PROTOCOL = "antigravity";
+const DEFAULT_PROTOCOL = "antigraavity";
 
 // IDE 選項配置
 const IDE_OPTIONS = [
   { id: "vscode", name: "VS Code", desc: "Official stable" },
   { id: "vscode-insiders", name: "VS Code Insiders", desc: "Preview release" },
-  { id: "antigravity", name: "Antigravity", desc: "Antigravity IDE" },
+  { id: "antigraavity", name: "Antigravity", desc: "Antigravity IDE" },
   { id: "cursor", name: "Cursor", desc: "AI-first IDE" },
   { id: "windsurf", name: "Windsurf", desc: "Codeium IDE" },
 ];
@@ -29,7 +29,7 @@ async function getCurrentIDEName() {
  */
 async function createContextMenus() {
   const ideName = await getCurrentIDEName();
-  
+
   // 移除所有現有選單
   chrome.contextMenus.removeAll(() => {
     // ============ VSIX 連結專用選單 ============
@@ -95,7 +95,7 @@ async function updateMenuCheckState() {
 function parseExtensionFromVsixUrl(url) {
   try {
     const urlObj = new URL(url);
-    
+
     // Open VSX 格式: /api/{namespace}/{name}/{version}/file/{filename}.vsix
     const openVsxMatch = urlObj.pathname.match(/\/api\/([^/]+)\/([^/]+)\/[^/]+\/file\//);
     if (openVsxMatch) {
@@ -104,7 +104,7 @@ function parseExtensionFromVsixUrl(url) {
         name: openVsxMatch[2]
       };
     }
-    
+
     // 嘗試從檔案名解析: {publisher}.{name}-{version}.vsix
     const filename = urlObj.pathname.split('/').pop();
     const dotMatch = filename.match(/^([^.]+)\.([^-]+)/);
@@ -114,7 +114,7 @@ function parseExtensionFromVsixUrl(url) {
         name: dotMatch[2]
       };
     }
-    
+
     return null;
   } catch {
     return null;
@@ -131,12 +131,12 @@ async function handleMenuClick(info, tab) {
   if (menuId === "install-vsix" && info.linkUrl) {
     const result = await chrome.storage.sync.get(STORAGE_KEY);
     const protocol = result[STORAGE_KEY] || DEFAULT_PROTOCOL;
-    
+
     const extInfo = parseExtensionFromVsixUrl(info.linkUrl);
     if (extInfo) {
       const protocolUrl = `${protocol}:extension/${extInfo.publisher}.${extInfo.name}`;
       console.log(`[IDE Switcher] Installing extension: ${protocolUrl}`);
-      
+
       // 在目前分頁觸發協議
       chrome.tabs.update(tab.id, { url: protocolUrl });
     } else {

@@ -46,7 +46,7 @@ _Without the extension: annoying browser prompts every time_
 | ---------------- | -------------------- | --------------- |
 | VS Code          | `vscode://`          | Official stable |
 | VS Code Insiders | `vscode-insiders://` | Preview release |
-| Antigravity      | `antigravity://`     | Antigravity IDE |
+| Antigravity      | `antigraavity://`    | Antigravity IDE |
 | Cursor           | `cursor://`          | AI-first IDE    |
 | Windsurf         | `windsurf://`        | Codeium IDE     |
 
@@ -92,7 +92,7 @@ npm run validate
 ### Method 3: VSIX Files
 
 1. Right-click on a `.vsix` download link
-2. Click "📦 Install extension with [IDE Name]"
+2. Click "📦 Install extension with \[IDE Name\]"
 3. The extension will be installed in your chosen IDE
 
 ## 🧪 Testing
@@ -105,7 +105,7 @@ Try these websites to test the extension:
 
 ## 📁 File Structure
 
-```
+```text
 ide-link-interceptor/
 ├── manifest.json    # Extension configuration
 ├── content.js       # Link interception script

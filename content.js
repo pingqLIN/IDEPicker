@@ -9,11 +9,11 @@
  * 2. JavaScript 動態觸發的協議導航（如 GitHub MCP）
  */
 
-(function() {
+(function () {
   'use strict';
 
   const STORAGE_KEY = 'selectedProtocol';
-  const DEFAULT_PROTOCOL = 'antigravity';
+  const DEFAULT_PROTOCOL = 'antigraavity';
 
   // 支援攔截的 IDE 協議前綴（包含競爭 IDE）
   const VSCODE_PROTOCOLS = [
@@ -23,13 +23,13 @@
     'windsurf:',
     'vscodium:'
   ];
-  
+
   // 支援攔截的 vscode.dev 重定向網址模式 (GitHub MCP 使用)
   const VSCODE_DEV_REDIRECT_PATTERNS = [
     'vscode.dev/redirect',
     'insiders.vscode.dev/redirect'
   ];
-  
+
   // 當前選擇的目標協議
   let targetProtocol = DEFAULT_PROTOCOL;
 
@@ -89,14 +89,14 @@
   function convertVSCodeDevToProtocol(url) {
     try {
       const urlObj = new URL(url);
-      
+
       // 格式 1: 檢查是否有 url 參數（GitHub MCP Registry 使用）
       const urlParam = urlObj.searchParams.get('url');
       if (urlParam) {
         // 解碼 url 參數，取得實際的 vscode: 連結
         const decodedUrl = decodeURIComponent(urlParam);
         console.log(`[IDE Switcher] 解碼的 vscode 連結: ${decodedUrl}`);
-        
+
         // 替換協議 (vscode: 或 vscode-insiders: → 目標協議)
         for (const protocol of VSCODE_PROTOCOLS) {
           if (decodedUrl.startsWith(protocol)) {
@@ -109,7 +109,7 @@
         }
         return decodedUrl;
       }
-      
+
       // 格式 2: 路徑格式 (/redirect/mcp/install?...)
       const path = urlObj.pathname.replace('/redirect', '');
       const queryString = urlObj.search;
@@ -143,22 +143,22 @@
     if (!link) return;
 
     const href = link.getAttribute('href') || link.href;
-    
+
     // 處理 vscode.dev 重定向連結 (GitHub MCP 使用)
     if (isVSCodeDevRedirectUrl(href)) {
       const targetUrl = convertVSCodeDevToProtocol(href);
       if (!targetUrl) return;
-      
+
       event.preventDefault();
       event.stopPropagation();
-      
+
       console.log(`[IDE Switcher] 攔截 vscode.dev 連結: ${href}`);
       console.log(`[IDE Switcher] 重定向至: ${targetUrl}`);
-      
+
       window.location.href = targetUrl;
       return;
     }
-    
+
     // 處理標準 vscode:// 協議連結
     if (!isVSCodeUrl(href)) return;
 
@@ -194,7 +194,7 @@
     script.textContent = `
       (function() {
         const TARGET_PROTOCOL = '${targetProtocol}';
-        const VSCODE_PROTOCOLS = ['vscode:', 'vscode-insiders:', 'cursor:', 'windsurf:', 'vscodium:'];
+        const VSCODE_PROTOCOLS = ['vscode:', 'vscode-insiders:', 'cursor:', 'windsurf:', 'vscodium:', 'antigraavity:'];
         const VSCODE_DEV_PATTERNS = ['vscode.dev/redirect', 'insiders.vscode.dev/redirect'];
         
         // 檢查是否為 VS Code 協議 URL
@@ -334,7 +334,7 @@
         console.log('[IDE Switcher] JS 攔截器已注入，目標: ' + TARGET_PROTOCOL);
       })();
     `;
-    
+
     // 盡早注入腳本
     (document.head || document.documentElement).appendChild(script);
   }
@@ -348,9 +348,9 @@
         if (mutation.type === 'childList') {
           mutation.addedNodes.forEach((node) => {
             if (node.nodeType === Node.ELEMENT_NODE) {
-              const links = node.querySelectorAll ? 
+              const links = node.querySelectorAll ?
                 node.querySelectorAll('a[href^="vscode:"], a[href^="vscode-insiders:"], a[href^="cursor:"], a[href^="windsurf:"], a[href^="vscodium:"]') : [];
-              
+
               links.forEach(link => {
                 if (!link.dataset.ideSwitcherProcessed) {
                   link.dataset.ideSwitcherProcessed = 'true';
@@ -374,10 +374,10 @@
   async function init() {
     await loadSettings();
     listenForSettingsChanges();
-    
+
     // 注入 JS 攔截器（攔截動態導航）
     injectInterceptorScript();
-    
+
     // 監聯連結點擊（攔截標準 <a> 連結）
     document.addEventListener('click', handleClick, true);
 

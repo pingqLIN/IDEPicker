@@ -19,7 +19,7 @@ Chrome 擴充功能，攔截 IDE 協議連結（`vscode://`、`cursor://`、`win
 | ---------------- | -------------------- |
 | VS Code          | `vscode://`          |
 | VS Code Insiders | `vscode-insiders://` |
-| Antigravity      | `antigravity://`     |
+| Antigravity      | `antigraavity://`    |
 | Cursor           | `cursor://`          |
 | Windsurf         | `windsurf://`        |
 
@@ -47,7 +47,7 @@ Chrome 擴充功能，攔截 IDE 協議連結（`vscode://`、`cursor://`、`win
 ### 方法三：安裝 VSIX 擴充套件
 
 1. 在 `.vsix` 下載連結上按右鍵
-2. 點擊「📦 用 [IDE 名稱] 安裝此擴充套件」
+2. 點擊「📦 用 \[IDE 名稱\] 安裝此擴充套件」
 3. 擴充套件會自動安裝到選定的 IDE
 
 ## 🧪 測試
