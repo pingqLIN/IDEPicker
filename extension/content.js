@@ -30,6 +30,15 @@
     'insiders.vscode.dev/redirect'
   ];
 
+  // 避免破壞 OAuth/登入流程（例如 GitHub Copilot / GitHub Auth 回呼）
+  // 典型回呼：vscode://vscode.github-authentication/did-authenticate?code=...&state=...
+  function isAuthCallbackUrl(url) {
+    if (!url || typeof url !== 'string') return false;
+    const match = url.match(/^([^:]+):\/\/([^/]+)\//) || url.match(/^([^:]+):([^/]+)\//);
+    const provider = (match?.[2] || '').toLowerCase();
+    return provider.includes('authentication');
+  }
+
   // 當前選擇的目標協議
   let targetProtocol = DEFAULT_PROTOCOL;
 
@@ -119,6 +128,12 @@
         const decodedUrl = decodeURIComponent(urlParam);
         console.log(`[IDE Switcher] 解碼的 vscode 連結: ${decodedUrl}`);
 
+        // OAuth/登入回呼不轉換，避免破壞 IDE 的認證流程
+        if (isAuthCallbackUrl(decodedUrl)) {
+          console.log('[IDE Switcher] 偵測到認證回呼連結，略過轉換');
+          return decodedUrl;
+        }
+
         // 替換協議 (vscode: 或 vscode-insiders: → 目標協議)
         for (const protocol of VSCODE_PROTOCOLS) {
           if (decodedUrl.startsWith(protocol)) {
@@ -146,6 +161,10 @@
    * 將 VS Code URL 轉換為目標協議 URL
    */
   function convertToTargetUrl(url) {
+    // OAuth/登入回呼不轉換，避免破壞 IDE 的認證流程
+    if (isAuthCallbackUrl(url)) {
+      return url;
+    }
     if (url.startsWith(`${targetProtocol}:`)) {
       return url;
     }
@@ -165,6 +184,9 @@
     if (!link) return;
 
     const href = link.getAttribute('href') || link.href;
+
+    // OAuth/登入回呼不攔截，避免 GitHub Copilot 登入失敗
+    if (isAuthCallbackUrl(href)) return;
 
     // 處理 vscode.dev 重定向連結 (GitHub MCP 使用)
     if (isVSCodeDevRedirectUrl(href)) {
@@ -250,4 +272,3 @@
 
   init();
 })();
-

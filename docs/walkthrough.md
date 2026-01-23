@@ -25,16 +25,20 @@
 ## 檔案結構
 
 ```
-vscode-antigravity-linker/
-├── manifest.json    # 擴充功能配置
-├── content.js       # 連結攔截腳本
-├── popup.html       # Popup 介面
-├── popup.css        # Popup 樣式
-├── popup.js         # Popup 邏輯
-└── icons/
-    ├── icon16.png
-    ├── icon48.png
-    └── icon128.png
+IDE-Link-Interceptor/
+├── extension/           # 可直接「載入未封裝」的擴充元件資料夾
+│   ├── manifest.json
+│   ├── background.js
+│   ├── content.js
+│   ├── interceptor.js
+│   ├── popup.html
+│   ├── popup.css
+│   ├── popup.js
+│   ├── _locales/
+│   └── icons/
+├── scripts/             # 開發/打包用腳本
+├── docs/
+└── package.json
 ```
 
 ---
@@ -47,7 +51,7 @@ vscode-antigravity-linker/
 4. 選擇資料夾：
 
    ```
-   c:\Users\addra\.gemini\antigravity\playground\crystal-astro\vscode-antigravity-linker
+   <你的專案路徑>/IDE-Link-Interceptor/extension
    ```
 
 ---
@@ -68,7 +72,7 @@ vscode-antigravity-linker/
 
 ## GitHub MCP 修復說明
 
-GitHub MCP 頁面的「Install in VS Code」按鈕使用 JavaScript 動態觸發 `vscode://` 協議，而非標準 `<a>` 連結。已更新 `content.js` 注入攔截器覆寫：
+GitHub MCP 頁面的「Install in VS Code」按鈕使用 JavaScript 動態觸發 `vscode://` 協議，而非標準 `<a>` 連結。已加入 `extension/interceptor.js`（Main World）攔截下列 API：
 
 - `window.location.href`
 - `window.location.assign()`
@@ -76,3 +80,16 @@ GitHub MCP 頁面的「Install in VS Code」按鈕使用 JavaScript 動態觸發
 - `window.open()`
 
 ![GitHub MCP 頁面](file:///C:/Users/addra/.gemini/antigravity/brain/f37dc266-81ab-4b5e-b20f-6497a4dcffe0/.system_generated/click_feedback/click_feedback_1768719570314.png)
+
+---
+
+## GitHub Copilot / GitHub 登入認證問題修復
+
+部分 IDE 的 GitHub OAuth 回呼會使用類似下列的協議連結：
+
+- `vscode://vscode.github-authentication/did-authenticate?...`
+- `cursor://vscode.github-authentication/did-authenticate?...`
+
+若把這類「authentication 回呼」誤轉成其他 IDE 的協議，會導致登入完成後無法把 token 回傳給原本發起登入的 IDE（表現為 Copilot 登入卡住/失敗）。
+
+修復方式：偵測 provider 含 `authentication` 的協議連結並**保留原樣**，不進行攔截轉換。

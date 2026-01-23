@@ -14,6 +14,14 @@
   const VSCODE_PROTOCOLS = ['vscode:', 'vscode-insiders:', 'cursor:', 'windsurf:', 'vscodium:', 'antigraavity:'];
   const VSCODE_DEV_PATTERNS = ['vscode.dev/redirect', 'insiders.vscode.dev/redirect'];
 
+  // 避免破壞 OAuth/登入流程（例如 GitHub Copilot / GitHub Auth 回呼）
+  function isAuthCallbackUrl(url) {
+    if (!url || typeof url !== 'string') return false;
+    const match = url.match(/^([^:]+):\/\/([^/]+)\//) || url.match(/^([^:]+):([^/]+)\//);
+    const provider = (match?.[2] || '').toLowerCase();
+    return provider.includes('authentication');
+  }
+
   // 從 dataset 讀取目標協議，預設為 antigraavity
   function getTargetProtocol() {
     return document.documentElement.dataset.ideTargetProtocol || 'antigraavity';
@@ -35,6 +43,7 @@
   function convertVSCodeUrl(url) {
     const targetProtocol = getTargetProtocol();
     if (url.startsWith(targetProtocol + ':')) return url;
+    if (isAuthCallbackUrl(url)) return url;
 
     for (const protocol of VSCODE_PROTOCOLS) {
       if (url.startsWith(protocol)) {
@@ -54,6 +63,7 @@
       const urlParam = urlObj.searchParams.get('url');
       if (urlParam) {
         const decodedUrl = decodeURIComponent(urlParam);
+        if (isAuthCallbackUrl(decodedUrl)) return decodedUrl;
         for (const protocol of VSCODE_PROTOCOLS) {
           if (decodedUrl.startsWith(protocol)) {
             return decodedUrl.replace(protocol, targetProtocol + ':');
@@ -77,6 +87,7 @@
 
   // 統一處理 URL 轉換
   function processUrl(url) {
+    if (isAuthCallbackUrl(url)) return url;
     if (isVSCodeDevUrl(url)) {
       return convertVSCodeDevUrl(url);
     }

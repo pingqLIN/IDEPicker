@@ -5,9 +5,15 @@
 const fs = require('fs');
 const path = require('path');
 
-const manifestPath = path.join(__dirname, '..', 'manifest.json');
+const extensionDir = path.join(__dirname, '..', 'extension');
+const manifestPath = path.join(extensionDir, 'manifest.json');
 
 try {
+  if (!fs.existsSync(extensionDir)) {
+    console.error('❌ Missing extension/ directory (expected unpacked source at ./extension)');
+    process.exit(1);
+  }
+
   // Read and parse manifest.json
   const manifestContent = fs.readFileSync(manifestPath, 'utf8');
   const manifest = JSON.parse(manifestContent);
@@ -53,7 +59,7 @@ try {
   // Validate icons exist
   if (manifest.icons) {
     for (const [size, iconPath] of Object.entries(manifest.icons)) {
-      const fullPath = path.join(__dirname, '..', iconPath);
+      const fullPath = path.join(extensionDir, iconPath);
       if (!fs.existsSync(fullPath)) {
         console.error(`❌ Icon file not found: ${iconPath}`);
         isValid = false;
@@ -68,7 +74,7 @@ try {
     for (const script of manifest.content_scripts) {
       if (script.js) {
         for (const jsFile of script.js) {
-          const fullPath = path.join(__dirname, '..', jsFile);
+          const fullPath = path.join(extensionDir, jsFile);
           if (!fs.existsSync(fullPath)) {
             console.error(`❌ Content script not found: ${jsFile}`);
             isValid = false;
@@ -82,7 +88,7 @@ try {
 
   // Validate background service worker
   if (manifest.background && manifest.background.service_worker) {
-    const swPath = path.join(__dirname, '..', manifest.background.service_worker);
+    const swPath = path.join(extensionDir, manifest.background.service_worker);
     if (!fs.existsSync(swPath)) {
       console.error(`❌ Service worker not found: ${manifest.background.service_worker}`);
       isValid = false;
@@ -93,7 +99,7 @@ try {
 
   // Validate action popup
   if (manifest.action && manifest.action.default_popup) {
-    const popupPath = path.join(__dirname, '..', manifest.action.default_popup);
+    const popupPath = path.join(extensionDir, manifest.action.default_popup);
     if (!fs.existsSync(popupPath)) {
       console.error(`❌ Popup HTML not found: ${manifest.action.default_popup}`);
       isValid = false;

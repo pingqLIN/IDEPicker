@@ -1,5 +1,7 @@
 # IDE Link Interceptor
 
+[中文版](README.zh-TW.md)
+
 <div align="center">
 
 [![CI](https://github.com/pingqLIN/IDE-Link-Interceptor/actions/workflows/ci.yml/badge.svg)](https://github.com/pingqLIN/IDE-Link-Interceptor/actions/workflows/ci.yml)
@@ -67,7 +69,7 @@ A browser extension that intercepts IDE hyperlinks (`vscode://`, `cursor://`, `w
 1. Navigate to `chrome://extensions/` (or `edge://extensions/` for Edge)
 2. Enable "**Developer mode**" in the top right corner
 3. Click "**Load unpacked**"
-4. Select the extension folder
+4. Select `extension/` (the folder that contains `manifest.json`)
 
 ### From Source
 
@@ -114,6 +116,8 @@ Try these websites to test the extension:
 - [Open VSX Registry](https://open-vsx.org/) - Download `.vsix` files
 
 ## 🛠️ Development
+
+Extension runtime files live in `extension/`. See `docs/project-structure.md` and `docs/global-workflow.md`.
 
 ### Setting up Environment
 

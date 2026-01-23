@@ -1,10 +1,10 @@
 {
     "name": "ide-link-interceptor",
-    "version": "1.4.0",
+    "version": "1.4.1",
     "description": "Browser extension that intercepts IDE hyperlinks and lets you choose which IDE to open them with",
     "scripts": {
-        "lint": "eslint *.js",
-        "lint:fix": "eslint *.js --fix",
+        "lint": "eslint extension/*.js",
+        "lint:fix": "eslint extension/*.js --fix",
         "package": "node scripts/package.js",
         "validate": "node scripts/validate-manifest.js"
     },
