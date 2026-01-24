@@ -62,7 +62,14 @@ async function createContextMenus() {
       id: 'install-vsix',
       title: chrome.i18n.getMessage('menuInstallVsix', [ideName]),
       contexts: ['link'],
-      targetUrlPatterns: ['*://*/*.vsix', '*://*/*.vsix?*']
+      targetUrlPatterns: [
+        '*://*/*.vsix',
+        '*://*/*.vsix?*',
+        '*://open-vsx.org/api/*/*/*/file*',
+        '*://*.open-vsx.org/api/*/*/*/file*',
+        '*://github.com/*/*/releases/download/*/*.vsix',
+        '*://github.com/*/*/releases/download/*/*.vsix?*'
+      ]
     });
 
     // ============ IDE 選擇選單 ============
@@ -115,35 +122,61 @@ async function updateMenuCheckState() {
 
 /**
  * 從 VSIX URL 解析擴充套件資訊
- * 支援 Open VSX 格式: https://open-vsx.org/api/{namespace}/{name}/{version}/file/{name}-{version}.vsix
+ * 支援 Open VSX 格式: https://open-vsx.org/api/{namespace}/{name}/{version}/file
+ * 或 https://open-vsx.org/api/{namespace}/{name}/{version}/file/{name}-{version}.vsix
  */
 function parseExtensionFromVsixUrl(url) {
   try {
     const urlObj = new URL(url);
 
     // Open VSX 格式: /api/{namespace}/{name}/{version}/file/{filename}.vsix
-    const openVsxMatch = urlObj.pathname.match(/\/api\/([^/]+)\/([^/]+)\/[^/]+\/file\//);
+    const openVsxMatch = urlObj.pathname.match(/^\/api\/([^/]+)\/([^/]+)\/([^/]+)\/file(?:\/([^/]+))?$/);
     if (openVsxMatch) {
       return {
         publisher: openVsxMatch[1],
-        name: openVsxMatch[2]
+        name: openVsxMatch[2],
+        version: openVsxMatch[3]
       };
     }
 
     // 嘗試從檔案名解析: {publisher}.{name}-{version}.vsix
     const filename = urlObj.pathname.split('/').pop();
-    const dotMatch = filename.match(/^([^.]+)\.([^-]+)/);
-    if (dotMatch) {
-      return {
-        publisher: dotMatch[1],
-        name: dotMatch[2]
-      };
+    if (filename) {
+      const vsixMatch = filename.match(/^(.+)\.vsix$/i);
+      if (vsixMatch) {
+        const baseName = vsixMatch[1];
+        const lastDash = baseName.lastIndexOf('-');
+        const namePart = lastDash > 0 ? baseName.slice(0, lastDash) : baseName;
+        const version = lastDash > 0 ? baseName.slice(lastDash + 1) : null;
+        const dotIndex = namePart.indexOf('.');
+        if (dotIndex > 0) {
+          return {
+            publisher: namePart.slice(0, dotIndex),
+            name: namePart.slice(dotIndex + 1),
+            version: version || undefined
+          };
+        }
+      }
     }
 
     return null;
   } catch {
     return null;
   }
+}
+
+/**
+ * 依照規範建立 VSIX 安裝協議 URL
+ */
+function buildVsixInstallUrl(protocol, vsixUrl, extInfo) {
+  const params = new URLSearchParams({ url: vsixUrl });
+  if (extInfo?.publisher && extInfo?.name) {
+    params.set('name', `${extInfo.publisher}.${extInfo.name}`);
+  }
+  if (extInfo?.version) {
+    params.set('version', extInfo.version);
+  }
+  return `${protocol}://extension/install?${params.toString()}`;
 }
 
 /**
@@ -158,15 +191,11 @@ async function handleMenuClick(info, tab) {
     const protocol = result[STORAGE_KEY] || DEFAULT_PROTOCOL;
 
     const extInfo = parseExtensionFromVsixUrl(info.linkUrl);
-    if (extInfo) {
-      const protocolUrl = `${protocol}:extension/${extInfo.publisher}.${extInfo.name}`;
-      console.log(`[IDE Switcher] Installing extension: ${protocolUrl}`);
+    const protocolUrl = buildVsixInstallUrl(protocol, info.linkUrl, extInfo);
+    console.log(`[IDE Switcher] Installing extension: ${protocolUrl}`);
 
-      // 在目前分頁觸發協議
-      chrome.tabs.update(tab.id, { url: protocolUrl });
-    } else {
-      console.warn('[IDE Switcher] Unable to parse extension info:', info.linkUrl);
-    }
+    // 在目前分頁觸發協議
+    chrome.tabs.update(tab.id, { url: protocolUrl });
     return;
   }
 
