@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="zh-TW">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Popup UI Test</title>
+    <link rel="stylesheet" href="../extension/popup.css" />
+    <style>
+      body {
+        background-color: #f3f3f3;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+      .container {
+        background: white;
+        padding: 20px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+    </style>
+    <script>
+      // Mock Chrome API
+      window.chrome = {
+        storage: {
+          sync: {
+            data: {},
+            get: function (key) {
+              return Promise.resolve(this.data);
+            },
+            set: function (obj) {
+              Object.assign(this.data, obj);
+              console.log("[MockStorage] Saved:", obj);
+              return Promise.resolve();
+            },
+          },
+        },
+        i18n: {
+          getMessage: function (key) {
+            const messages = {
+              warningNotInstalled: "注意：請確保已安裝相應的 IDE",
+            };
+            return messages[key] || key;
+          },
+        },
+      };
+    </script>
+  </head>
+  <body>
+    <!-- Copy of popup.html structure -->
+    <div class="container">
+      <div class="ide-list">
+        <!-- VS Code -->
+        <button class="ide-option" data-protocol="vscode">
+          <span class="ide-icon">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M17.5 3L10 10.5L17.5 18V21L3 12L6 9.5L17.5 14.5V3Z"
+                fill="#007ACC"
+              />
+              <path
+                d="M17.5 3V14.5L6 9.5L3 12L17.5 21V18L10 10.5L17.5 3Z"
+                fill="#0065A9"
+              />
+              <path d="M17.5 3L21 5V19L17.5 21V3Z" fill="#1F9CF0" />
+            </svg>
+          </span>
+          <span class="ide-info"><span class="ide-name">VS Code</span></span>
+          <span class="check-icon"
+            ><svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="3"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <polyline points="20 6 9 17 4 12"></polyline></svg
+          ></span>
+        </button>
+
+        <!-- VS Code Insiders -->
+        <button class="ide-option" data-protocol="vscode-insiders">
+          <span class="ide-icon">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M17.5 3L10 10.5L17.5 18V21L3 12L6 9.5L17.5 14.5V3Z"
+                fill="#24BFA5"
+              />
+              <path
+                d="M17.5 3V14.5L6 9.5L3 12L17.5 21V18L10 10.5L17.5 3Z"
+                fill="#1A9E84"
+              />
+              <path d="M17.5 3L21 5V19L17.5 21V3Z" fill="#2DD4BF" />
+            </svg>
+          </span>
+          <span class="ide-info"
+            ><span class="ide-name">VS Code Insiders</span></span
+          >
+          <span class="check-icon"
+            ><svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="3"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <polyline points="20 6 9 17 4 12"></polyline></svg
+          ></span>
+        </button>
+
+        <!-- Antigravity -->
+        <button class="ide-option" data-protocol="antigravity">
+          <span class="ide-icon">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <defs>
+                <linearGradient
+                  id="agGradient"
+                  x1="0%"
+                  y1="100%"
+                  x2="100%"
+                  y2="0%"
+                >
+                  <stop offset="0%" class="gradient-stop-start" />
+                  <stop offset="100%" class="gradient-stop-end" />
+                </linearGradient>
+              </defs>
+              <circle cx="12" cy="12" r="10" fill="url(#agGradient)" />
+              <path
+                d="M12 17V7M8 11L12 7L16 11"
+                stroke="white"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </span>
+          <span class="ide-info"
+            ><span class="ide-name">Antigravity</span></span
+          >
+          <span class="check-icon"
+            ><svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="3"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <polyline points="20 6 9 17 4 12"></polyline></svg
+          ></span>
+        </button>
+
+        <!-- Cursor -->
+        <button class="ide-option" data-protocol="cursor">
+          <span class="ide-icon">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <rect x="2" y="2" width="20" height="20" rx="4" fill="#1a1a1a" />
+              <path
+                d="M7 8C7 7.44772 7.44772 7 8 7H10C13.3137 7 16 9.68629 16 13C16 16.3137 13.3137 19 10 19H8C7.44772 19 7 18.5523 7 18V8Z"
+                stroke="#ffffff"
+                stroke-width="2"
+              />
+            </svg>
+          </span>
+          <span class="ide-info"><span class="ide-name">Cursor</span></span>
+          <span class="check-icon"
+            ><svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="3"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <polyline points="20 6 9 17 4 12"></polyline></svg
+          ></span>
+        </button>
+
+        <!-- Windsurf -->
+        <button class="ide-option" data-protocol="windsurf">
+          <span class="ide-icon">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <rect x="2" y="2" width="20" height="20" rx="4" fill="#0D1117" />
+              <path
+                d="M6 12C6 12 9 8 12 8C15 8 18 12 18 12C18 12 15 16 12 16C9 16 6 12 6 12Z"
+                fill="#00D4AA"
+              />
+              <circle cx="12" cy="12" r="2" fill="#0D1117" />
+            </svg>
+          </span>
+          <span class="ide-info"><span class="ide-name">Windsurf</span></span>
+          <span class="check-icon"
+            ><svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="3"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <polyline points="20 6 9 17 4 12"></polyline></svg
+          ></span>
+        </button>
+      </div>
+
+      <div class="footer">
+        <p id="warning-msg" class="warning-text"></p>
+      </div>
+    </div>
+
+    <script src="../extension/popup.js"></script>
+  </body>
+</html>

@@ -11,7 +11,7 @@
 const IDE_PROVIDER_MAP = {
     'vscode': 'github.remotehub',
     'vscode-insiders': 'github.remotehub',
-    'antigraavity': 'git',
+    'antigravity': 'git',
     'cursor': 'repo',
     'windsurf': 'repo',
     'vscodium': 'github.remotehub'
@@ -108,8 +108,8 @@ function runTests() {
 
     test(
         '1.2 VS Code → Antigravity 轉換使用 git provider',
-        convertVSCodeUrl('vscode://github.remotehub/open?url=https%3A%2F%2Fgithub.com%2Fmcp%2Fcontext7', 'antigraavity'),
-        'antigraavity://git/open?url=https%3A%2F%2Fgithub.com%2Fmcp%2Fcontext7'
+        convertVSCodeUrl('vscode://github.remotehub/open?url=https%3A%2F%2Fgithub.com%2Fmcp%2Fcontext7', 'antigravity'),
+        'antigravity://git/open?url=https%3A%2F%2Fgithub.com%2Fmcp%2Fcontext7'
     );
 
     test(
@@ -129,14 +129,14 @@ function runTests() {
 
     test(
         '2.1 標準 vscode:// 格式轉換',
-        convertVSCodeUrl('vscode://github.remotehub/clone?url=https%3A%2F%2Fgithub.com%2Fuser%2Frepo', 'antigraavity'),
-        'antigraavity://git/clone?url=https%3A%2F%2Fgithub.com%2Fuser%2Frepo'
+        convertVSCodeUrl('vscode://github.remotehub/clone?url=https%3A%2F%2Fgithub.com%2Fuser%2Frepo', 'antigravity'),
+        'antigravity://git/clone?url=https%3A%2F%2Fgithub.com%2Fuser%2Frepo'
     );
 
     test(
         '2.2 含分支參數的轉換',
-        convertVSCodeUrl('vscode://github.remotehub/open?url=https%3A%2F%2Fgithub.com%2Fuser%2Frepo&branch=main', 'antigraavity'),
-        'antigraavity://git/open?url=https%3A%2F%2Fgithub.com%2Fuser%2Frepo&branch=main'
+        convertVSCodeUrl('vscode://github.remotehub/open?url=https%3A%2F%2Fgithub.com%2Fuser%2Frepo&branch=main', 'antigravity'),
+        'antigravity://git/open?url=https%3A%2F%2Fgithub.com%2Fuser%2Frepo&branch=main'
     );
 
     test(
@@ -150,8 +150,8 @@ function runTests() {
 
     test(
         '3.1 Open VSX 完整格式（含版本）',
-        buildVsixInstallUrl('antigraavity', 'https://open-vsx.org/api/pub/ext/1.2.3/file', 'pub', 'ext', '1.2.3'),
-        'antigraavity://extension/install?url=https%3A%2F%2Fopen-vsx.org%2Fapi%2Fpub%2Fext%2F1.2.3%2Ffile&name=pub.ext&version=1.2.3'
+        buildVsixInstallUrl('antigravity', 'https://open-vsx.org/api/pub/ext/1.2.3/file', 'pub', 'ext', '1.2.3'),
+        'antigravity://extension/install?url=https%3A%2F%2Fopen-vsx.org%2Fapi%2Fpub%2Fext%2F1.2.3%2Ffile&name=pub.ext&version=1.2.3'
     );
 
     test(
@@ -162,8 +162,20 @@ function runTests() {
 
     test(
         '3.3 特殊字元 URL encoding',
-        buildVsixInstallUrl('antigraavity', 'https://example.com/ext?token=abc&id=123', 'test', 'ext', '2.0.0'),
-        'antigraavity://extension/install?url=https%3A%2F%2Fexample.com%2Fext%3Ftoken%3Dabc%26id%3D123&name=test.ext&version=2.0.0'
+        buildVsixInstallUrl('antigravity', 'https://example.com/ext?token=abc&id=123', 'test', 'ext', '2.0.0'),
+        'antigravity://extension/install?url=https%3A%2F%2Fexample.com%2Fext%3Ftoken%3Dabc%26id%3D123&name=test.ext&version=2.0.0'
+    );
+
+    test(
+        '3.4 Marketplace vsassets 下載 URL',
+        buildVsixInstallUrl(
+            'antigravity',
+            'https://ms-python.gallery.vsassets.io/_apis/public/gallery/publisher/ms-python/extension/python/2026.0.0/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage',
+            'ms-python',
+            'python',
+            '2026.0.0'
+        ),
+        'antigravity://extension/install?url=https%3A%2F%2Fms-python.gallery.vsassets.io%2F_apis%2Fpublic%2Fgallery%2Fpublisher%2Fms-python%2Fextension%2Fpython%2F2026.0.0%2Fassetbyname%2FMicrosoft.VisualStudio.Services.VSIXPackage&name=ms-python.python&version=2026.0.0'
     );
 
     // ========== 測試 4: URL Encoding ==========
@@ -207,7 +219,7 @@ function runTests() {
 
     test(
         '5.2 cursor://...authentication... 不轉換',
-        convertVSCodeUrl('cursor://vscode.github-authentication/did-authenticate?code=abc&state=def', 'antigraavity'),
+        convertVSCodeUrl('cursor://vscode.github-authentication/did-authenticate?code=abc&state=def', 'antigravity'),
         'cursor://vscode.github-authentication/did-authenticate?code=abc&state=def'
     );
 

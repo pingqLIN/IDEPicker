@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IDE Link Interceptor - Test Page</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 20px;
+      background: #1e1e1e;
+      color: #d4d4d4;
+    }
+    h1, h2, h3 { color: #569cd6; }
+    .section {
+      background: #252526;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 20px 0;
+    }
+    .test-link {
+      display: block;
+      background: #0e639c;
+      color: white;
+      padding: 12px 20px;
+      margin: 10px 0;
+      text-decoration: none;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+    .test-link:hover { background: #1177bb; }
+    .test-link code {
+      background: rgba(0,0,0,0.3);
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 12px;
+    }
+    .description {
+      color: #9cdcfe;
+      font-size: 13px;
+      margin-top: 5px;
+    }
+    .warning {
+      background: #4d3d00;
+      border-left: 4px solid #ffcc00;
+      padding: 10px 15px;
+      margin: 15px 0;
+    }
+    .success {
+      background: #1d3d1d;
+      border-left: 4px solid #4ec9b0;
+      padding: 10px 15px;
+      margin: 15px 0;
+    }
+    button {
+      background: #0e639c;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      margin: 10px 5px 10px 0;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    button:hover { background: #1177bb; }
+    #result {
+      background: #1e1e1e;
+      border: 1px solid #3c3c3c;
+      padding: 15px;
+      margin-top: 15px;
+      border-radius: 4px;
+      font-family: monospace;
+      white-space: pre-wrap;
+      min-height: 100px;
+    }
+  </style>
+</head>
+<body>
+  <h1>IDE Link Interceptor - Test Page</h1>
+  
+  <div class="warning">
+    <strong>Instructions:</strong>
+    <ol>
+      <li>Open Chrome DevTools (F12) and switch to Console tab</li>
+      <li>Click the extension icon and select your target IDE (e.g., Antigravity)</li>
+      <li>Click each test link below and observe the console logs</li>
+      <li>Look for <code>[IDE Switcher]</code> messages showing the URL conversion</li>
+    </ol>
+  </div>
+
+  <div class="section">
+    <h2>1. Extension Install Links (vscode:extension/...)</h2>
+    <p class="description">These links should open the extension page in your target IDE.</p>
+    
+    <a href="vscode:extension/ms-python.python" class="test-link">
+      Python Extension <code>vscode:extension/ms-python.python</code>
+    </a>
+    
+    <a href="vscode:extension/esbenp.prettier-vscode" class="test-link">
+      Prettier Extension <code>vscode:extension/esbenp.prettier-vscode</code>
+    </a>
+    
+    <a href="vscode-insiders:extension/GitHub.copilot" class="test-link">
+      GitHub Copilot <code>vscode-insiders:extension/GitHub.copilot</code>
+    </a>
+  </div>
+
+  <div class="section">
+    <h2>2. File Open Links (vscode://file/...)</h2>
+    <p class="description">These links should open a file in your target IDE.</p>
+    
+    <a href="vscode://file/C:/test/example.py:10:5" class="test-link">
+      Open File (Windows) <code>vscode://file/C:/test/example.py:10:5</code>
+    </a>
+    
+    <a href="vscode://file//home/user/project/main.py" class="test-link">
+      Open File (Linux) <code>vscode://file//home/user/project/main.py</code>
+    </a>
+  </div>
+
+  <div class="section">
+    <h2>3. MCP Install Links</h2>
+    <p class="description">These links should trigger MCP server installation.</p>
+    
+    <a href="vscode:mcp/install?%7B%22name%22%3A%22test-server%22%2C%22type%22%3A%22http%22%2C%22url%22%3A%22https%3A%2F%2Fexample.com%2Fmcp%22%7D" class="test-link">
+      MCP HTTP Server <code>vscode:mcp/install?{...}</code>
+    </a>
+  </div>
+
+  <div class="section">
+    <h2>4. JavaScript Navigation Tests</h2>
+    <p class="description">Test JavaScript-triggered navigation (interceptor.js).</p>
+    
+    <button onclick="testLocationHref()">Test location.href</button>
+    <button onclick="testLocationAssign()">Test location.assign()</button>
+    <button onclick="testWindowOpen()">Test window.open()</button>
+    
+    <div id="result">Click a button to test JavaScript navigation...</div>
+  </div>
+
+  <div class="section">
+    <h2>5. Expected URL Conversions</h2>
+    <table style="width: 100%; border-collapse: collapse;">
+      <tr style="background: #3c3c3c;">
+        <th style="padding: 10px; text-align: left;">Target IDE</th>
+        <th style="padding: 10px; text-align: left;">Input</th>
+        <th style="padding: 10px; text-align: left;">Expected Output</th>
+      </tr>
+      <tr>
+        <td style="padding: 10px;">Antigravity</td>
+        <td style="padding: 10px;"><code>vscode:extension/ms-python.python</code></td>
+        <td style="padding: 10px;"><code>antigravity://extension/ms-python.python</code></td>
+      </tr>
+      <tr style="background: #2d2d2d;">
+        <td style="padding: 10px;">Cursor</td>
+        <td style="padding: 10px;"><code>vscode:extension/ms-python.python</code></td>
+        <td style="padding: 10px;"><code>cursor:extension/ms-python.python</code></td>
+      </tr>
+      <tr>
+        <td style="padding: 10px;">VS Code</td>
+        <td style="padding: 10px;"><code>cursor:extension/ms-python.python</code></td>
+        <td style="padding: 10px;"><code>vscode:extension/ms-python.python</code></td>
+      </tr>
+      <tr style="background: #2d2d2d;">
+        <td style="padding: 10px;">Antigravity</td>
+        <td style="padding: 10px;"><code>vscode://file/path</code></td>
+        <td style="padding: 10px;"><code>antigravity://file/path</code></td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="success">
+    <strong>What to check:</strong>
+    <ul>
+      <li>Console shows <code>[IDE Switcher] 攔截擴充連結: ...</code></li>
+      <li>Console shows <code>[IDE Switcher] 重定向至: antigravity://...</code> (for Antigravity)</li>
+      <li>Your IDE should launch and open the extension page</li>
+    </ul>
+  </div>
+
+  <script>
+    function testLocationHref() {
+      const url = 'vscode:extension/ms-python.python';
+      document.getElementById('result').textContent = 
+        `Testing: window.location.href = "${url}"\n\nCheck console for [IDE Switcher] logs...`;
+      
+      // Slight delay to show the message
+      setTimeout(() => {
+        window.location.href = url;
+      }, 500);
+    }
+
+    function testLocationAssign() {
+      const url = 'vscode:extension/esbenp.prettier-vscode';
+      document.getElementById('result').textContent = 
+        `Testing: window.location.assign("${url}")\n\nCheck console for [IDE Switcher] logs...`;
+      
+      setTimeout(() => {
+        window.location.assign(url);
+      }, 500);
+    }
+
+    function testWindowOpen() {
+      const url = 'vscode://file/C:/test/example.py';
+      document.getElementById('result').textContent = 
+        `Testing: window.open("${url}")\n\nCheck console for [IDE Switcher] logs...\n\n(Note: This may be blocked by popup blocker)`;
+      
+      setTimeout(() => {
+        window.open(url);
+      }, 500);
+    }
+  </script>
+</body>
+</html>
