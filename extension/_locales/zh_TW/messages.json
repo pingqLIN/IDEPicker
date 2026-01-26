@@ -28,5 +28,35 @@
     "warningNotInstalled": {
         "message": "若程式未安裝則不會有反應",
         "description": "Warning message in popup footer"
+    },
+    "notificationVsixDownloaded": {
+        "message": "VSIX 已下載",
+        "description": "Notification title when VSIX is downloaded"
+    },
+    "notificationVsixInstallHint": {
+        "message": "使用 \"$IDE_NAME$ --install-extension <路徑>\" 或拖曳至擴充功能視窗安裝。",
+        "description": "Notification message with install instructions",
+        "placeholders": {
+            "ide_name": {
+                "content": "$1",
+                "example": "Antigravity"
+            }
+        }
+    },
+    "notificationInstalling": {
+        "message": "正在安裝擴充功能",
+        "description": "Notification title when installation starts"
+    },
+    "notificationInstallSuccess": {
+        "message": "安裝成功",
+        "description": "Notification title when installation succeeds"
+    },
+    "notificationInstallFailed": {
+        "message": "安裝失敗",
+        "description": "Notification title when installation fails"
+    },
+    "notificationInstalledTo": {
+        "message": "已安裝至",
+        "description": "Text between extension ID and IDE name in success notification"
     }
 }

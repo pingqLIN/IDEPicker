@@ -28,5 +28,35 @@
     "warningNotInstalled": {
         "message": "No reaction if program is not installed",
         "description": "Warning message in popup footer"
+    },
+    "notificationVsixDownloaded": {
+        "message": "VSIX Downloaded",
+        "description": "Notification title when VSIX is downloaded"
+    },
+    "notificationVsixInstallHint": {
+        "message": "Use \"$IDE_NAME$ --install-extension <path>\" or drag into Extensions view.",
+        "description": "Notification message with install instructions",
+        "placeholders": {
+            "ide_name": {
+                "content": "$1",
+                "example": "Antigravity"
+            }
+        }
+    },
+    "notificationInstalling": {
+        "message": "Installing Extension",
+        "description": "Notification title when installation starts"
+    },
+    "notificationInstallSuccess": {
+        "message": "Installation Successful",
+        "description": "Notification title when installation succeeds"
+    },
+    "notificationInstallFailed": {
+        "message": "Installation Failed",
+        "description": "Notification title when installation fails"
+    },
+    "notificationInstalledTo": {
+        "message": "installed to",
+        "description": "Text between extension ID and IDE name in success notification"
     }
 }
