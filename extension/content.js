@@ -13,12 +13,21 @@
   'use strict';
 
   const STORAGE_KEY = 'selectedProtocol';
-  const DEFAULT_PROTOCOL = 'antigraavity';
+  const DEFAULT_PROTOCOL = 'antigravity';
+
+  const SUPPORTED_PROTOCOLS = new Set([
+    'vscode',
+    'vscode-insiders',
+    'antigravity',
+    'cursor',
+    'windsurf'
+  ]);
 
   // 支援攔截的 IDE 協議前綴（包含競爭 IDE）
   const VSCODE_PROTOCOLS = [
     'vscode:',
     'vscode-insiders:',
+    'antigravity:',
     'cursor:',
     'windsurf:',
     'vscodium:'
@@ -30,6 +39,8 @@
     'insiders.vscode.dev/redirect'
   ];
 
+  const VSCODE_EXTENSION_SCHEMES = new Set(['vscode', 'vscode-insiders']);
+
   // 避免破壞 OAuth/登入流程（例如 GitHub Copilot / GitHub Auth 回呼）
   // 典型回呼：vscode://vscode.github-authentication/did-authenticate?code=...&state=...
   function isAuthCallbackUrl(url) {
@@ -39,13 +50,17 @@
     return provider.includes('authentication');
   }
 
+  /**
+   * 取得協議前綴
+   * Antigravity 使用 antigravity:// 格式（有雙斜線）
+   * 其他 IDE 使用 protocol: 格式（無雙斜線）
+   */
+  function getProtocolPrefix() {
+    return targetProtocol === 'antigravity' ? `${targetProtocol}://` : `${targetProtocol}:`;
+  }
+
   // 當前選擇的目標協議
   let targetProtocol = DEFAULT_PROTOCOL;
-
-  // 舊協議 ID 到新協議 ID 的映射（用於遷移）
-  const PROTOCOL_MIGRATION_MAP = {
-    'antigravity': 'antigraavity'
-  };
 
   /**
    * 從 storage 載入用戶設定（含遷移邏輯）
@@ -54,13 +69,10 @@
     try {
       const result = await chrome.storage.sync.get(STORAGE_KEY);
       let protocol = result[STORAGE_KEY] || DEFAULT_PROTOCOL;
-
-      // 自動遷移舊的協議 ID
-      if (PROTOCOL_MIGRATION_MAP[protocol]) {
-        const newProtocol = PROTOCOL_MIGRATION_MAP[protocol];
-        console.log(`[IDE Switcher] 遷移協議: ${protocol} -> ${newProtocol}`);
-        await chrome.storage.sync.set({ [STORAGE_KEY]: newProtocol });
-        protocol = newProtocol;
+      if (!SUPPORTED_PROTOCOLS.has(protocol)) {
+        console.log(`[IDE Switcher] 修正協議: ${protocol} -> ${DEFAULT_PROTOCOL}`);
+        await chrome.storage.sync.set({ [STORAGE_KEY]: DEFAULT_PROTOCOL });
+        protocol = DEFAULT_PROTOCOL;
       }
 
       targetProtocol = protocol;
@@ -84,7 +96,8 @@
   function listenForSettingsChanges() {
     chrome.storage.onChanged.addListener((changes, areaName) => {
       if (areaName === 'sync' && changes[STORAGE_KEY]) {
-        targetProtocol = changes[STORAGE_KEY].newValue || DEFAULT_PROTOCOL;
+        const nextProtocol = changes[STORAGE_KEY].newValue || DEFAULT_PROTOCOL;
+        targetProtocol = SUPPORTED_PROTOCOLS.has(nextProtocol) ? nextProtocol : DEFAULT_PROTOCOL;
         console.log(`[IDE Switcher] 設定已更新，目標 IDE: ${targetProtocol}`);
         // 更新 dataset 供 interceptor.js 讀取
         updateInterceptorState();
@@ -106,6 +119,124 @@
   function isVSCodeDevRedirectUrl(url) {
     if (!url) return false;
     return VSCODE_DEV_REDIRECT_PATTERNS.some(pattern => url.includes(pattern));
+  }
+
+  /**
+   * 判斷是否為 VSIX 下載連結
+   */
+  function isVsixUrl(url) {
+    try {
+      const urlObj = new URL(url);
+      if (urlObj.protocol !== 'http:' && urlObj.protocol !== 'https:') return false;
+      const hostname = urlObj.hostname.toLowerCase();
+      const pathname = urlObj.pathname.toLowerCase();
+
+      if (pathname.endsWith('.vsix')) return true;
+
+      if (hostname === 'open-vsx.org' || hostname.endsWith('.open-vsx.org')) {
+        if (/^\/api\/[^/]+\/[^/]+\/[^/]+\/file/.test(pathname)) return true;
+      }
+
+      if (hostname.endsWith('.gallery.vsassets.io')) {
+        if (/^\/_apis\/public\/gallery\/publisher\/[^/]+\/extension\/[^/]+\/[^/]+\/assetbyname\//.test(pathname)) {
+          return true;
+        }
+      }
+
+      if (hostname === 'marketplace.visualstudio.com') {
+        if (/^\/_apis\/public\/gallery\/publishers\/[^/]+\/vsextensions\/[^/]+\/[^/]+\/vspackage$/.test(pathname)) {
+          return true;
+        }
+      }
+
+      if (hostname === 'github.com') {
+        if (/^\/[^/]+\/[^/]+\/releases\/download\/[^/]+\/.+\.vsix$/.test(pathname)) {
+          return true;
+        }
+      }
+
+      return false;
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * 從 VSIX URL 解析擴充套件資訊
+   */
+  function parseExtensionFromVsixUrl(url) {
+    try {
+      const urlObj = new URL(url);
+      const hostname = urlObj.hostname.toLowerCase();
+
+      if (hostname.endsWith('.gallery.vsassets.io')) {
+        const vsAssetsMatch = urlObj.pathname.match(
+          /^\/_apis\/public\/gallery\/publisher\/([^/]+)\/extension\/([^/]+)\/([^/]+)\/assetbyname\/.+$/
+        );
+        if (vsAssetsMatch) {
+          return { publisher: vsAssetsMatch[1], name: vsAssetsMatch[2], version: vsAssetsMatch[3] };
+        }
+      }
+
+      if (hostname === 'marketplace.visualstudio.com') {
+        const marketplaceMatch = urlObj.pathname.match(
+          /^\/_apis\/public\/gallery\/publishers\/([^/]+)\/vsextensions\/([^/]+)\/([^/]+)\/vspackage$/
+        );
+        if (marketplaceMatch) {
+          return { publisher: marketplaceMatch[1], name: marketplaceMatch[2], version: marketplaceMatch[3] };
+        }
+      }
+
+      const openVsxMatch = urlObj.pathname.match(/^\/api\/([^/]+)\/([^/]+)\/([^/]+)\/file(?:\/([^/]+))?$/);
+      if (openVsxMatch) {
+        return { publisher: openVsxMatch[1], name: openVsxMatch[2], version: openVsxMatch[3] };
+      }
+
+      const filename = urlObj.pathname.split('/').pop();
+      if (filename) {
+        const vsixMatch = filename.match(/^(.+)\.vsix$/i);
+        if (vsixMatch) {
+          const baseName = vsixMatch[1];
+          const lastDash = baseName.lastIndexOf('-');
+          const namePart = lastDash > 0 ? baseName.slice(0, lastDash) : baseName;
+          const version = lastDash > 0 ? baseName.slice(lastDash + 1) : null;
+          const dotIndex = namePart.indexOf('.');
+          if (dotIndex > 0) {
+            return {
+              publisher: namePart.slice(0, dotIndex),
+              name: namePart.slice(dotIndex + 1),
+              version: version || undefined
+            };
+          }
+        }
+      }
+
+      return null;
+    } catch {
+      return null;
+    }
+  }
+
+  /**
+   * 依照規範建立 VSIX 安裝協議 URL
+   */
+  function buildVsixInstallUrl(protocol, vsixUrl, extInfo) {
+    const params = new URLSearchParams({ url: vsixUrl });
+    if (extInfo?.publisher && extInfo?.name) {
+      params.set('name', `${extInfo.publisher}.${extInfo.name}`);
+    }
+    if (extInfo?.version) {
+      params.set('version', extInfo.version);
+    }
+    return `${protocol}://extension/install?${params.toString()}`;
+  }
+
+  function parseVSCodeExtensionId(url) {
+    const match = url.match(/^([^:]+):(\/\/)?extension\/([^?#]+)/);
+    if (!match) return null;
+    const scheme = match[1];
+    if (!VSCODE_EXTENSION_SCHEMES.has(scheme)) return null;
+    return match[3];
   }
 
   /**
@@ -137,11 +268,13 @@
         // 替換協議 (vscode: 或 vscode-insiders: → 目標協議)
         for (const protocol of VSCODE_PROTOCOLS) {
           if (decodedUrl.startsWith(protocol)) {
-            return decodedUrl.replace(protocol, `${targetProtocol}:`);
+            // 移除來源協議，取得路徑部分
+            const path = decodedUrl.slice(protocol.length);
+            return `${getProtocolPrefix()}${path}`;
           }
         }
         // 如果已經是目標協議，直接返回
-        if (decodedUrl.startsWith(`${targetProtocol}:`)) {
+        if (decodedUrl.startsWith(`${targetProtocol}:`) || decodedUrl.startsWith(`${targetProtocol}://`)) {
           return decodedUrl;
         }
         return decodedUrl;
@@ -149,8 +282,10 @@
 
       // 格式 2: 路徑格式 (/redirect/mcp/install?...)
       const path = urlObj.pathname.replace('/redirect', '');
+      const normalizedPath = path.startsWith('/') ? path.slice(1) : path;
       const queryString = urlObj.search;
-      return `${targetProtocol}:${path}${queryString}`;
+      // 所有路徑都使用統一的協議前綴
+      return `${getProtocolPrefix()}${normalizedPath}${queryString}`;
     } catch (error) {
       console.error('[IDE Switcher] 轉換 vscode.dev 連結失敗:', error);
       return null;
@@ -165,12 +300,17 @@
     if (isAuthCallbackUrl(url)) {
       return url;
     }
-    if (url.startsWith(`${targetProtocol}:`)) {
+    // 已經是目標協議
+    if (url.startsWith(`${targetProtocol}:`) || url.startsWith(`${targetProtocol}://`)) {
       return url;
     }
+    // 替換來源協議為目標協議
     for (const protocol of VSCODE_PROTOCOLS) {
       if (url.startsWith(protocol)) {
-        return url.replace(protocol, `${targetProtocol}:`);
+        // 移除來源協議，取得路徑部分
+        const path = url.slice(protocol.length);
+        // 根據目標協議格式重建 URL
+        return `${getProtocolPrefix()}${path}`;
       }
     }
     return url;
@@ -179,7 +319,7 @@
   /**
    * 處理連結點擊事件
    */
-  function handleClick(event) {
+  async function handleClick(event) {
     const link = event.target.closest('a');
     if (!link) return;
 
@@ -187,6 +327,64 @@
 
     // OAuth/登入回呼不攔截，避免 GitHub Copilot 登入失敗
     if (isAuthCallbackUrl(href)) return;
+
+    // 處理 VS Code Marketplace 安裝連結 (vscode:extension/...)
+    // 注意：所有 VS Code 系列 IDE 都支援 {protocol}:extension/{id} 格式開啟擴充頁面
+    // 但不支援自動安裝，用戶需要在 IDE 內點擊「安裝」按鈕
+    const extensionId = parseVSCodeExtensionId(href);
+    if (extensionId) {
+      // 如果目標協議就是原始協議，不需要轉換
+      if (VSCODE_EXTENSION_SCHEMES.has(targetProtocol) && href.startsWith(`${targetProtocol}:`)) {
+        return; // 讓瀏覽器正常處理
+      }
+
+      event.preventDefault();
+      event.stopPropagation();
+
+      console.log(`[IDE Switcher] 攔截擴充連結: ${href}`);
+      console.log(`[IDE Switcher] 擴充功能 ID: ${extensionId}`);
+      
+      // 嘗試透過 Native Host 安裝（適用於 Antigravity 等不支援 protocol URL 的 IDE）
+      try {
+        const response = await chrome.runtime.sendMessage({
+          action: 'installExtension',
+          extensionId: extensionId
+        });
+        
+        if (response && response.success) {
+          console.log('[IDE Switcher] 擴充功能安裝成功');
+        } else if (response && response.error === 'Native Host not installed') {
+          // Native Host 未安裝，回退到 protocol URL
+          console.log('[IDE Switcher] Native Host 未安裝，嘗試使用 protocol URL');
+          const protocolUrl = `${getProtocolPrefix()}extension/${extensionId}`;
+          console.log(`[IDE Switcher] 重定向至: ${protocolUrl}`);
+          window.location.href = protocolUrl;
+        } else {
+          console.error('[IDE Switcher] 安裝失敗:', response?.error);
+        }
+      } catch (err) {
+        // 通訊失敗，回退到 protocol URL
+        console.error('[IDE Switcher] 無法連接 background script:', err);
+        const protocolUrl = `${getProtocolPrefix()}extension/${extensionId}`;
+        console.log(`[IDE Switcher] 回退到 protocol URL: ${protocolUrl}`);
+        window.location.href = protocolUrl;
+      }
+      return;
+    }
+
+      event.preventDefault();
+      event.stopPropagation();
+
+      // 直接轉換協議，讓 IDE 開啟擴充頁面
+      // VS Code 系列使用 protocol:extension/{id}
+      // Antigravity 使用 antigravity://extension/{id}
+      const protocolUrl = `${getProtocolPrefix()}extension/${extensionId}`;
+      console.log(`[IDE Switcher] 攔截擴充連結: ${href}`);
+      console.log(`[IDE Switcher] 重定向至: ${protocolUrl}`);
+      console.log('[IDE Switcher] 注意：IDE 將開啟擴充頁面，請在 IDE 內點擊「安裝」完成安裝');
+      window.location.href = protocolUrl;
+      return;
+    }
 
     // 處理 vscode.dev 重定向連結 (GitHub MCP 使用)
     if (isVSCodeDevRedirectUrl(href)) {
@@ -200,6 +398,21 @@
       console.log(`[IDE Switcher] 重定向至: ${targetUrl}`);
 
       window.location.href = targetUrl;
+      return;
+    }
+
+    // 處理 VSIX 下載連結 (Open VSX / Marketplace / GitHub Releases / *.vsix)
+    if (isVsixUrl(href)) {
+      const extInfo = parseExtensionFromVsixUrl(href);
+      const protocolUrl = buildVsixInstallUrl(targetProtocol, href, extInfo);
+
+      event.preventDefault();
+      event.stopPropagation();
+
+      console.log(`[IDE Switcher] 攔截 VSIX 下載: ${href}`);
+      console.log(`[IDE Switcher] 重定向至: ${protocolUrl}`);
+
+      window.location.href = protocolUrl;
       return;
     }
 

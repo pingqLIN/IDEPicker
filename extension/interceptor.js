@@ -14,7 +14,6 @@
   const VSCODE_PROTOCOLS = [
     'vscode:',
     'vscode-insiders:',
-    'antigraavity:',
     'antigravity:',
     'cursor:',
     'windsurf:',
@@ -26,7 +25,10 @@
   const MCP_PATTERNS = [
     'vscode:mcp/install',
     'vscode-insiders:mcp/install',
-    'cursor://-deeplink/mcp/install'
+    'cursor://anysphere.cursor-deeplink/mcp/install',  // Cursor 官方 deeplink 格式
+    'cursor://-deeplink/mcp/install',  // 舊格式相容
+    'vscode:mcp/by-name',
+    'vscode-insiders:mcp/by-name'
   ];
 
   // 避免破壞 OAuth/登入流程（例如 GitHub Copilot / GitHub Auth 回呼）
@@ -37,9 +39,24 @@
     return provider.includes('authentication');
   }
 
-  // 從 dataset 讀取目標協議，預設為 antigraavity
+  // 從 dataset 讀取目標協議，預設為 antigravity
   function getTargetProtocol() {
-    return document.documentElement.dataset.ideTargetProtocol || 'antigraavity';
+    return document.documentElement.dataset.ideTargetProtocol || 'antigravity';
+  }
+
+  function getMcpProtocolPrefix() {
+    const targetProtocol = getTargetProtocol();
+    return targetProtocol === 'antigravity' ? `${targetProtocol}://` : `${targetProtocol}:`;
+  }
+
+  /**
+   * 取得協議前綴
+   * Antigravity 使用 antigravity:// 格式（有雙斜線）
+   * 其他 IDE 使用 protocol: 格式（無雙斜線）
+   */
+  function getProtocolPrefix() {
+    const targetProtocol = getTargetProtocol();
+    return targetProtocol === 'antigravity' ? `${targetProtocol}://` : `${targetProtocol}:`;
   }
 
   // 檢查是否為 VS Code 協議 URL
@@ -63,56 +80,106 @@
   // 轉換 MCP 安裝 URL (支援多種 IDE 格式)
   function convertMCPUrl(url) {
     const targetProtocol = getTargetProtocol();
-    
-    // vscode:mcp/install?{config} -> targetProtocol:mcp/install?{config}
-    // cursor://-deeplink/mcp/install?... -> targetProtocol:mcp/install?{config}
-    
-    // 處理 Cursor 專屬格式
-    if (url.includes('cursor://-deeplink/mcp/install')) {
+
+    // 如果目標是 Cursor，需要轉換成 Cursor deeplink 格式
+    // cursor://anysphere.cursor-deeplink/mcp/install?name=$NAME&config=$BASE64_CONFIG
+    if (targetProtocol === 'cursor') {
+      return convertToCursorMCPUrl(url);
+    }
+
+    // 處理 Cursor 專屬格式轉換為其他 IDE
+    if (url.includes('cursor://anysphere.cursor-deeplink/mcp/install') || 
+        url.includes('cursor://-deeplink/mcp/install')) {
       try {
-        // cursor://-deeplink/mcp/install?name=xxx&config=base64
-        const urlPart = url.split('cursor://-deeplink/mcp/install')[1];
+        const urlPart = url.includes('anysphere.cursor-deeplink') 
+          ? url.split('cursor://anysphere.cursor-deeplink/mcp/install')[1]
+          : url.split('cursor://-deeplink/mcp/install')[1];
         const params = new URLSearchParams(urlPart.startsWith('?') ? urlPart.slice(1) : urlPart);
         const name = params.get('name');
         const configBase64 = params.get('config');
-        
+
         if (configBase64) {
           // 解碼 base64 配置
           const configJson = atob(configBase64);
-          // 重新編碼為 URL 編碼的 JSON (VS Code 格式)
-          const encodedConfig = encodeURIComponent(configJson);
+          const config = JSON.parse(configJson);
           
-          // 建立新的 MCP URL
-          if (name) {
-            return `${targetProtocol}:mcp/install?%7B%22name%22%3A%22${encodeURIComponent(name)}%22%2C${encodedConfig.slice(3)}`; 
-          }
-          return `${targetProtocol}:mcp/install?${encodedConfig}`;
+          // 建立標準 MCP 配置
+          const mcpConfig = name ? { name, ...config } : config;
+          const encodedConfig = encodeURIComponent(JSON.stringify(mcpConfig));
+          
+          return `${getMcpProtocolPrefix()}mcp/install?${encodedConfig}`;
         }
       } catch (e) {
-        console.error('[IDE Switcher] MCP URL 轉換失敗:', e);
+        console.error('[IDE Switcher] Cursor MCP URL 轉換失敗:', e);
       }
     }
-    
-    // 處理 VS Code 格式: vscode:mcp/install?{encoded_json}
+
+    // 處理 VS Code 格式: vscode:mcp/install?{encoded_json} 或 vscode:mcp/by-name/...
     for (const protocol of VSCODE_PROTOCOLS) {
-      const mcpPattern = protocol + 'mcp/install';
-      if (url.startsWith(mcpPattern)) {
-        return url.replace(protocol, targetProtocol + ':');
+      if (url.startsWith(protocol + 'mcp/install') || url.startsWith(protocol + 'mcp/by-name')) {
+        return url.replace(protocol, getMcpProtocolPrefix());
       }
     }
-    
+
+    return url;
+  }
+
+  // 轉換為 Cursor MCP deeplink 格式
+  function convertToCursorMCPUrl(url) {
+    try {
+      // 從 VS Code 格式解析 MCP 配置
+      // vscode:mcp/install?{url_encoded_json}
+      let mcpConfig = null;
+      let configJson = null;
+
+      // 嘗試解析 URL 編碼的 JSON 配置
+      for (const protocol of VSCODE_PROTOCOLS) {
+        if (url.startsWith(protocol + 'mcp/install?')) {
+          const queryPart = url.split('?')[1];
+          if (queryPart) {
+            configJson = decodeURIComponent(queryPart);
+            mcpConfig = JSON.parse(configJson);
+            break;
+          }
+        }
+      }
+
+      if (mcpConfig) {
+        const name = mcpConfig.name || 'mcp-server';
+        // 移除 name 屬性後編碼為 base64
+        // eslint-disable-next-line no-unused-vars
+        const { name: _removed, ...configWithoutName } = mcpConfig;
+        const configBase64 = btoa(JSON.stringify(configWithoutName));
+        
+        return `cursor://anysphere.cursor-deeplink/mcp/install?name=${encodeURIComponent(name)}&config=${configBase64}`;
+      }
+    } catch (e) {
+      console.error('[IDE Switcher] 轉換至 Cursor MCP 格式失敗:', e);
+    }
+
+    // 回退：直接替換協議前綴
+    for (const protocol of VSCODE_PROTOCOLS) {
+      if (url.startsWith(protocol + 'mcp/')) {
+        return url.replace(protocol, 'cursor:');
+      }
+    }
+
     return url;
   }
 
   // 轉換 VS Code 協議 URL
   function convertVSCodeUrl(url) {
     const targetProtocol = getTargetProtocol();
-    if (url.startsWith(targetProtocol + ':')) return url;
+    // 已經是目標協議
+    if (url.startsWith(targetProtocol + ':') || url.startsWith(targetProtocol + '://')) return url;
     if (isAuthCallbackUrl(url)) return url;
 
     for (const protocol of VSCODE_PROTOCOLS) {
       if (url.startsWith(protocol)) {
-        return url.replace(protocol, targetProtocol + ':');
+        // 移除來源協議，取得路徑部分
+        const path = url.slice(protocol.length);
+        // 根據目標協議格式重建 URL
+        return getProtocolPrefix() + path;
       }
     }
     return url;
@@ -136,7 +203,6 @@
 
   // 轉換 vscode.dev 重定向連結 (支援兩種格式及多層編碼)
   function convertVSCodeDevUrl(url) {
-    const targetProtocol = getTargetProtocol();
     try {
       const urlObj = new URL(url);
 
@@ -146,18 +212,21 @@
         // 使用多層解碼處理雙重或多重編碼的 URL
         const decodedUrl = decodeMultiLayerUrl(urlParam);
         if (isAuthCallbackUrl(decodedUrl)) return decodedUrl;
-        
+
         // 檢查是否為 MCP URL 並進行轉換
         if (isMCPUrl(decodedUrl)) {
           return convertMCPUrl(decodedUrl);
         }
-        
+
         for (const protocol of VSCODE_PROTOCOLS) {
           if (decodedUrl.startsWith(protocol)) {
-            return decodedUrl.replace(protocol, targetProtocol + ':');
+            // 移除來源協議，取得路徑部分
+            const path = decodedUrl.slice(protocol.length);
+            return getProtocolPrefix() + path;
           }
         }
-        if (decodedUrl.startsWith(targetProtocol + ':')) {
+        const targetProtocol = getTargetProtocol();
+        if (decodedUrl.startsWith(targetProtocol + ':') || decodedUrl.startsWith(targetProtocol + '://')) {
           return decodedUrl;
         }
         return decodedUrl;
@@ -167,7 +236,8 @@
       const path = urlObj.pathname.replace('/redirect', '');
       const normalizedPath = path.startsWith('/') ? path.slice(1) : path;
       const queryString = urlObj.search;
-      return targetProtocol + ':' + normalizedPath + queryString;
+      // 使用統一的協議前綴
+      return getProtocolPrefix() + normalizedPath + queryString;
     } catch (e) {
       console.error('[IDE Switcher] 轉換失敗:', e);
       return null;

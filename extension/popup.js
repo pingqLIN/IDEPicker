@@ -8,25 +8,15 @@
   'use strict';
 
   const STORAGE_KEY = 'selectedProtocol';
-  const DEFAULT_PROTOCOL = 'antigraavity';
+  const DEFAULT_PROTOCOL = 'antigravity';
 
-  // 舊協議 ID 到新協議 ID 的映射（用於遷移）
-  const PROTOCOL_MIGRATION_MAP = {
-    'antigravity': 'antigraavity'
-  };
-
-  /**
-   * 遷移舊的協議 ID 到新格式
-   */
-  async function migrateProtocolIfNeeded(protocol) {
-    if (PROTOCOL_MIGRATION_MAP[protocol]) {
-      const newProtocol = PROTOCOL_MIGRATION_MAP[protocol];
-      console.log(`[IDE Switcher] 遷移協議: ${protocol} -> ${newProtocol}`);
-      await chrome.storage.sync.set({ [STORAGE_KEY]: newProtocol });
-      return newProtocol;
-    }
-    return protocol;
-  }
+  const SUPPORTED_PROTOCOLS = new Set([
+    'vscode',
+    'vscode-insiders',
+    'antigravity',
+    'cursor',
+    'windsurf'
+  ]);
 
   /**
    * 取得目前選擇的協議
@@ -34,9 +24,11 @@
   async function getSelectedProtocol() {
     try {
       const result = await chrome.storage.sync.get(STORAGE_KEY);
-      let protocol = result[STORAGE_KEY] || DEFAULT_PROTOCOL;
-      // 自動遷移舊的協議 ID
-      protocol = await migrateProtocolIfNeeded(protocol);
+      const protocol = result[STORAGE_KEY] || DEFAULT_PROTOCOL;
+      if (!SUPPORTED_PROTOCOLS.has(protocol)) {
+        await chrome.storage.sync.set({ [STORAGE_KEY]: DEFAULT_PROTOCOL });
+        return DEFAULT_PROTOCOL;
+      }
       return protocol;
     } catch (error) {
       console.error('讀取設定失敗:', error);

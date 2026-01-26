@@ -1,19 +1,24 @@
 const STORAGE_KEY = 'selectedProtocol';
-const DEFAULT_PROTOCOL = 'antigraavity';
+const DEFAULT_PROTOCOL = 'antigravity';
+const NATIVE_HOST_NAME = 'com.idelinkinterceptor.host';
 
 // IDE 選項配置
 const IDE_OPTIONS = [
   { id: 'vscode', name: 'VS Code', desc: 'Official stable' },
   { id: 'vscode-insiders', name: 'VS Code Insiders', desc: 'Preview release' },
-  { id: 'antigraavity', name: 'Antigravity', desc: 'Antigravity IDE' },
+  { id: 'antigravity', name: 'Antigravity', desc: 'Antigravity IDE' },
   { id: 'cursor', name: 'Cursor', desc: 'AI-first IDE' },
   { id: 'windsurf', name: 'Windsurf', desc: 'Codeium IDE' },
 ];
 
-// 舊協議 ID 到新協議 ID 的映射（用於遷移）
-const PROTOCOL_MIGRATION_MAP = {
-  'antigravity': 'antigraavity'
-};
+const VALID_PROTOCOLS = new Set(IDE_OPTIONS.map(option => option.id));
+
+// Native Host 連線狀態
+let nativeHostAvailable = null; // null = 未知, true = 可用, false = 不可用
+
+function normalizeProtocol(protocol) {
+  return VALID_PROTOCOLS.has(protocol) ? protocol : DEFAULT_PROTOCOL;
+}
 
 /**
  * 遷移舊的協議 ID 到新格式
@@ -22,16 +27,16 @@ async function migrateProtocolIfNeeded() {
   try {
     const result = await chrome.storage.sync.get(STORAGE_KEY);
     const currentProtocol = result[STORAGE_KEY];
-    if (currentProtocol && PROTOCOL_MIGRATION_MAP[currentProtocol]) {
-      const newProtocol = PROTOCOL_MIGRATION_MAP[currentProtocol];
-      console.log(`[IDE Switcher] 遷移協議: ${currentProtocol} -> ${newProtocol}`);
-      await chrome.storage.sync.set({ [STORAGE_KEY]: newProtocol });
-      return newProtocol;
+    const normalizedProtocol = normalizeProtocol(currentProtocol);
+    if (currentProtocol && currentProtocol !== normalizedProtocol) {
+      console.log(`[IDE Switcher] 修正協議: ${currentProtocol} -> ${normalizedProtocol}`);
+      await chrome.storage.sync.set({ [STORAGE_KEY]: normalizedProtocol });
+      return normalizedProtocol;
     }
-    return currentProtocol;
+    return currentProtocol || DEFAULT_PROTOCOL;
   } catch (error) {
     console.error('[IDE Switcher] 遷移失敗:', error);
-    return null;
+    return DEFAULT_PROTOCOL;
   }
 }
 
@@ -41,12 +46,65 @@ async function migrateProtocolIfNeeded() {
 async function getCurrentIDEName() {
   try {
     const result = await chrome.storage.sync.get(STORAGE_KEY);
-    const currentProtocol = result[STORAGE_KEY] || DEFAULT_PROTOCOL;
+    const currentProtocol = normalizeProtocol(result[STORAGE_KEY]);
     const ide = IDE_OPTIONS.find(i => i.id === currentProtocol);
     return ide ? ide.name : 'IDE';
   } catch {
     return 'IDE';
   }
+}
+
+/**
+ * 檢查 Native Host 是否可用
+ */
+async function checkNativeHost() {
+  return new Promise((resolve) => {
+    try {
+      chrome.runtime.sendNativeMessage(
+        NATIVE_HOST_NAME,
+        { action: 'ping' },
+        (response) => {
+          if (chrome.runtime.lastError) {
+            console.log('[IDE Switcher] Native Host not available:', chrome.runtime.lastError.message);
+            nativeHostAvailable = false;
+            resolve(false);
+          } else if (response && response.success) {
+            console.log('[IDE Switcher] Native Host connected, version:', response.version);
+            nativeHostAvailable = true;
+            resolve(true);
+          } else {
+            nativeHostAvailable = false;
+            resolve(false);
+          }
+        }
+      );
+    } catch (e) {
+      console.error('[IDE Switcher] Native Host check error:', e);
+      nativeHostAvailable = false;
+      resolve(false);
+    }
+  });
+}
+
+/**
+ * 透過 Native Host 安裝擴充功能
+ */
+async function installViaHost(extensionId, ide) {
+  return new Promise((resolve, reject) => {
+    chrome.runtime.sendNativeMessage(
+      NATIVE_HOST_NAME,
+      { action: 'install', extensionId, ide },
+      (response) => {
+        if (chrome.runtime.lastError) {
+          reject(new Error(chrome.runtime.lastError.message));
+        } else if (response && response.success) {
+          resolve(response);
+        } else {
+          reject(new Error(response?.error || 'Unknown error'));
+        }
+      }
+    );
+  });
 }
 
 /**
@@ -67,6 +125,8 @@ async function createContextMenus() {
         '*://*/*.vsix?*',
         '*://open-vsx.org/api/*/*/*/file*',
         '*://*.open-vsx.org/api/*/*/*/file*',
+        '*://*.gallery.vsassets.io/_apis/public/gallery/publisher/*/extension/*/*/assetbyname/*',
+        '*://marketplace.visualstudio.com/_apis/public/gallery/publishers/*/vsextensions/*/*/vspackage',
         '*://github.com/*/*/releases/download/*/*.vsix',
         '*://github.com/*/*/releases/download/*/*.vsix?*'
       ]
@@ -101,7 +161,7 @@ async function createContextMenus() {
 async function updateMenuCheckState() {
   try {
     const result = await chrome.storage.sync.get(STORAGE_KEY);
-    const currentProtocol = result[STORAGE_KEY] || DEFAULT_PROTOCOL;
+    const currentProtocol = normalizeProtocol(result[STORAGE_KEY]);
     const ideName = IDE_OPTIONS.find(i => i.id === currentProtocol)?.name || 'IDE';
 
     // 更新 VSIX 安裝選單標題
@@ -128,6 +188,35 @@ async function updateMenuCheckState() {
 function parseExtensionFromVsixUrl(url) {
   try {
     const urlObj = new URL(url);
+    const hostname = urlObj.hostname.toLowerCase();
+
+    // Visual Studio Marketplace 資產 (gallery.vsassets.io)
+    if (hostname.endsWith('.gallery.vsassets.io')) {
+      const vsAssetsMatch = urlObj.pathname.match(
+        /^\/_apis\/public\/gallery\/publisher\/([^/]+)\/extension\/([^/]+)\/([^/]+)\/assetbyname\/.+$/
+      );
+      if (vsAssetsMatch) {
+        return {
+          publisher: vsAssetsMatch[1],
+          name: vsAssetsMatch[2],
+          version: vsAssetsMatch[3]
+        };
+      }
+    }
+
+    // Visual Studio Marketplace API
+    if (hostname === 'marketplace.visualstudio.com') {
+      const marketplaceMatch = urlObj.pathname.match(
+        /^\/_apis\/public\/gallery\/publishers\/([^/]+)\/vsextensions\/([^/]+)\/([^/]+)\/vspackage$/
+      );
+      if (marketplaceMatch) {
+        return {
+          publisher: marketplaceMatch[1],
+          name: marketplaceMatch[2],
+          version: marketplaceMatch[3]
+        };
+      }
+    }
 
     // Open VSX 格式: /api/{namespace}/{name}/{version}/file/{filename}.vsix
     const openVsxMatch = urlObj.pathname.match(/^\/api\/([^/]+)\/([^/]+)\/([^/]+)\/file(?:\/([^/]+))?$/);
@@ -166,17 +255,37 @@ function parseExtensionFromVsixUrl(url) {
 }
 
 /**
- * 依照規範建立 VSIX 安裝協議 URL
+ * 取得協議前綴
+ * Antigravity 使用 antigravity:// 格式（有雙斜線）
+ * 其他 IDE 使用 protocol: 格式（無雙斜線）
  */
-function buildVsixInstallUrl(protocol, vsixUrl, extInfo) {
-  const params = new URLSearchParams({ url: vsixUrl });
-  if (extInfo?.publisher && extInfo?.name) {
-    params.set('name', `${extInfo.publisher}.${extInfo.name}`);
+function getProtocolPrefix(protocol) {
+  return protocol === 'antigravity' ? `${protocol}://` : `${protocol}:`;
+}
+
+/**
+ * 建立擴充瀏覽 URL（開啟 Marketplace 頁面）
+ * 格式: vscode:extension/{publisher}.{name}
+ */
+function buildExtensionViewUrl(protocol, extInfo) {
+  if (!extInfo?.publisher || !extInfo?.name) {
+    return null;
   }
-  if (extInfo?.version) {
-    params.set('version', extInfo.version);
-  }
-  return `${protocol}://extension/install?${params.toString()}`;
+  const prefix = getProtocolPrefix(protocol);
+  return `${prefix}extension/${extInfo.publisher}.${extInfo.name}`;
+}
+
+/**
+ * 顯示安裝結果通知
+ */
+function showNotification(title, message, isError = false) {
+  chrome.notifications.create({
+    type: 'basic',
+    iconUrl: 'icons/icon128.png',
+    title: title,
+    message: message,
+    priority: isError ? 2 : 1
+  });
 }
 
 /**
@@ -189,13 +298,63 @@ async function handleMenuClick(info, tab) {
   if (menuId === 'install-vsix' && info.linkUrl) {
     const result = await chrome.storage.sync.get(STORAGE_KEY);
     const protocol = result[STORAGE_KEY] || DEFAULT_PROTOCOL;
+    const ideName = IDE_OPTIONS.find(i => i.id === protocol)?.name || protocol;
 
     const extInfo = parseExtensionFromVsixUrl(info.linkUrl);
-    const protocolUrl = buildVsixInstallUrl(protocol, info.linkUrl, extInfo);
-    console.log(`[IDE Switcher] Installing extension: ${protocolUrl}`);
+    
+    if (!extInfo) {
+      // 無法解析擴充資訊，直接下載 VSIX 並顯示提示
+      console.log(`[IDE Switcher] Cannot parse extension info, downloading VSIX: ${info.linkUrl}`);
+      downloadVsixWithNotification(info.linkUrl, ideName);
+      return;
+    }
 
-    // 在目前分頁觸發協議
-    chrome.tabs.update(tab.id, { url: protocolUrl });
+    const extensionId = `${extInfo.publisher}.${extInfo.name}`;
+    
+    // 嘗試透過 Native Host 安裝
+    if (nativeHostAvailable === null) {
+      await checkNativeHost();
+    }
+    
+    if (nativeHostAvailable) {
+      console.log(`[IDE Switcher] Installing ${extensionId} via Native Host...`);
+      showNotification(
+        chrome.i18n.getMessage('notificationInstalling') || 'Installing Extension',
+        `${extensionId} → ${ideName}`
+      );
+      
+      try {
+        const installResult = await installViaHost(extensionId, protocol);
+        console.log('[IDE Switcher] Install result:', installResult);
+        showNotification(
+          chrome.i18n.getMessage('notificationInstallSuccess') || 'Installation Successful',
+          `${extensionId} ${chrome.i18n.getMessage('notificationInstalledTo') || 'installed to'} ${ideName}`
+        );
+      } catch (err) {
+        console.error('[IDE Switcher] Install failed:', err);
+        showNotification(
+          chrome.i18n.getMessage('notificationInstallFailed') || 'Installation Failed',
+          err.message,
+          true
+        );
+        // 備援：下載 VSIX
+        downloadVsixWithNotification(info.linkUrl, ideName);
+      }
+    } else {
+      // Native Host 不可用，使用 protocol URL 或下載備援
+      console.log('[IDE Switcher] Native Host not available, using fallback...');
+      
+      // 嘗試使用 protocol URL (對於支援的 IDE)
+      const viewUrl = buildExtensionViewUrl(protocol, extInfo);
+      if (viewUrl && protocol !== 'antigravity') {
+        // 非 Antigravity 的 IDE 可能支援 protocol URL
+        console.log(`[IDE Switcher] Trying protocol URL: ${viewUrl}`);
+        chrome.tabs.update(tab.id, { url: viewUrl });
+      } else {
+        // Antigravity 或其他情況：下載 VSIX
+        downloadVsixWithNotification(info.linkUrl, ideName);
+      }
+    }
     return;
   }
 
@@ -215,12 +374,95 @@ async function handleMenuClick(info, tab) {
   }
 }
 
+/**
+ * 下載 VSIX 並顯示安裝提示
+ */
+function downloadVsixWithNotification(url, ideName) {
+  chrome.downloads.download({ url }, (downloadId) => {
+    if (chrome.runtime.lastError) {
+      console.error('[IDE Switcher] Download failed:', chrome.runtime.lastError);
+      return;
+    }
+    
+    showNotification(
+      chrome.i18n.getMessage('notificationVsixDownloaded') || 'VSIX Downloaded',
+      chrome.i18n.getMessage('notificationVsixInstallHint', [ideName]) || 
+        `Use "${ideName} --install-extension <path>" to install.`
+    );
+  });
+}
+
+/**
+ * 處理來自 content script 的擴充功能安裝請求
+ */
+async function handleInstallRequest(extensionId) {
+  const result = await chrome.storage.sync.get(STORAGE_KEY);
+  const protocol = result[STORAGE_KEY] || DEFAULT_PROTOCOL;
+  const ideName = IDE_OPTIONS.find(i => i.id === protocol)?.name || protocol;
+  
+  // 檢查 Native Host
+  if (nativeHostAvailable === null) {
+    await checkNativeHost();
+  }
+  
+  if (nativeHostAvailable) {
+    console.log(`[IDE Switcher] Installing ${extensionId} via Native Host...`);
+    showNotification(
+      chrome.i18n.getMessage('notificationInstalling') || 'Installing Extension',
+      `${extensionId} → ${ideName}`
+    );
+    
+    try {
+      await installViaHost(extensionId, protocol);
+      showNotification(
+        chrome.i18n.getMessage('notificationInstallSuccess') || 'Installation Successful',
+        `${extensionId} ${chrome.i18n.getMessage('notificationInstalledTo') || 'installed to'} ${ideName}`
+      );
+      return { success: true };
+    } catch (err) {
+      console.error('[IDE Switcher] Install failed:', err);
+      showNotification(
+        chrome.i18n.getMessage('notificationInstallFailed') || 'Installation Failed',
+        err.message,
+        true
+      );
+      return { success: false, error: err.message };
+    }
+  } else {
+    // Native Host 不可用，返回提示
+    return { 
+      success: false, 
+      error: 'Native Host not installed',
+      hint: `Please run the install script in native-host folder first.`
+    };
+  }
+}
+
+// 監聽來自 content script 的訊息
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.action === 'installExtension' && request.extensionId) {
+    handleInstallRequest(request.extensionId)
+      .then(sendResponse)
+      .catch(err => sendResponse({ success: false, error: err.message }));
+    return true; // 保持 sendResponse 有效
+  }
+  
+  if (request.action === 'checkNativeHost') {
+    checkNativeHost().then(available => {
+      sendResponse({ available });
+    });
+    return true;
+  }
+});
+
 // 監聽擴充功能安裝/更新
 chrome.runtime.onInstalled.addListener(async () => {
   console.log('[IDE Switcher] Extension installed/updated');
-  // 先執行遷移（處理舊的 antigravity -> antigraavity）
+  // 先執行修正（處理未知/過期協議值）
   await migrateProtocolIfNeeded();
   createContextMenus();
+  // 檢查 Native Host 狀態
+  await checkNativeHost();
 });
 
 // 監聽選單點擊
