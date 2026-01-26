@@ -14,9 +14,9 @@ $RegistryPath = switch ($Scope) {
     "HKCR" { "HKCR:\antigravity\shell\open\command" }
 }
 
-# 正確的指令格式 (經測試確認):
-# "C:\Dev\bin\Antigravity.exe" --url-handler "%1"
-$NewCommand = "`"$AntigravityPath`" --url-handler `"%1`""
+# 正確的指令格式 (從 VS Code 源碼確認):
+# "C:\Dev\bin\Antigravity.exe" "--open-url" "--" "%1"
+$NewCommand = "`"$AntigravityPath`" `"--open-url`" `"--`" `"%1`""
 
 Write-Host "🔍 Checking Registry Path: $RegistryPath"
 try {
