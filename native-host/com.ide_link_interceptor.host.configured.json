@@ -1,0 +1,9 @@
+{
+  "name": "com.ide_link_interceptor.host",
+  "description": "IDE Link Interceptor Native Messaging Host - Installs extensions via CLI",
+  "path": "C:\\Dev\\Projects\\IDE-Link-Interceptor\\native-host\\ide-link-host-wrapper.bat",
+  "type": "stdio",
+  "allowed_origins": [
+    "chrome-extension://bcdgpkcnobkjcmjfmeokfgdfpjljojjk/"
+  ]
+}
