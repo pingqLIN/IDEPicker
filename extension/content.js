@@ -372,20 +372,6 @@
       return;
     }
 
-      event.preventDefault();
-      event.stopPropagation();
-
-      // 直接轉換協議，讓 IDE 開啟擴充頁面
-      // VS Code 系列使用 protocol:extension/{id}
-      // Antigravity 使用 antigravity://extension/{id}
-      const protocolUrl = `${getProtocolPrefix()}extension/${extensionId}`;
-      console.log(`[IDE Switcher] 攔截擴充連結: ${href}`);
-      console.log(`[IDE Switcher] 重定向至: ${protocolUrl}`);
-      console.log('[IDE Switcher] 注意：IDE 將開啟擴充頁面，請在 IDE 內點擊「安裝」完成安裝');
-      window.location.href = protocolUrl;
-      return;
-    }
-
     // 處理 vscode.dev 重定向連結 (GitHub MCP 使用)
     if (isVSCodeDevRedirectUrl(href)) {
       const targetUrl = convertVSCodeDevToProtocol(href);

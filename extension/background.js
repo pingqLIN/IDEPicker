@@ -378,7 +378,7 @@ async function handleMenuClick(info, tab) {
  * 下載 VSIX 並顯示安裝提示
  */
 function downloadVsixWithNotification(url, ideName) {
-  chrome.downloads.download({ url }, (downloadId) => {
+  chrome.downloads.download({ url }, () => {
     if (chrome.runtime.lastError) {
       console.error('[IDE Switcher] Download failed:', chrome.runtime.lastError);
       return;
@@ -433,7 +433,7 @@ async function handleInstallRequest(extensionId) {
     return { 
       success: false, 
       error: 'Native Host not installed',
-      hint: `Please run the install script in native-host folder first.`
+      hint: 'Please run the install script in native-host folder first.'
     };
   }
 }
