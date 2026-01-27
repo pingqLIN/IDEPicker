@@ -74,6 +74,19 @@ function buildVsixInstallUrl(targetProtocol, vsixUrl, publisher, name, version) 
     return url;
 }
 
+/**
+ * 建構擴充 URL
+ * Antigravity 使用 protocol://id 格式
+ * 其他協議使用 protocol:extension/id 格式
+ */
+function buildExtensionUrl(protocol, publisher, name) {
+    const extensionId = `${publisher}.${name}`;
+    if (protocol === 'antigravity') {
+        return `antigravity://${extensionId}`;
+    }
+    return `${protocol}:extension/${extensionId}`;
+}
+
 // ========== 測試案例 ==========
 
 function runTests() {
@@ -221,6 +234,27 @@ function runTests() {
         '5.2 cursor://...authentication... 不轉換',
         convertVSCodeUrl('cursor://vscode.github-authentication/did-authenticate?code=abc&state=def', 'antigravity'),
         'cursor://vscode.github-authentication/did-authenticate?code=abc&state=def'
+    );
+
+    // ========== 測試 6: Antigravity 擴充 URL 格式 ==========
+    console.log('\n📋 測試 6: Antigravity 擴充 URL 格式');
+
+    test(
+        '6.1 Antigravity 擴充 URL 使用 protocol://id 格式',
+        buildExtensionUrl('antigravity', 'esbenp', 'prettier-vscode'),
+        'antigravity://esbenp.prettier-vscode'
+    );
+
+    test(
+        '6.2 VS Code 擴充 URL 保持 protocol:extension/id 格式',
+        buildExtensionUrl('vscode', 'esbenp', 'prettier-vscode'),
+        'vscode:extension/esbenp.prettier-vscode'
+    );
+
+    test(
+        '6.3 Cursor 擴充 URL 保持 protocol:extension/id 格式',
+        buildExtensionUrl('cursor', 'ms-python', 'python'),
+        'cursor:extension/ms-python.python'
     );
 
     // ========== 測試結果統計 ==========

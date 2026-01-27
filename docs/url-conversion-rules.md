@@ -48,9 +48,28 @@
 |---|---:|---|---|---|
 | VS Code stable | `vscode://` | 官方穩定版 | `vscode://github.remotehub/open?url=https%3A%2F%2Fgithub.com%2Fmcp%2Fupstash%2Fcontext7` | `vscode://extension/install?url=https%3A%2F%2Fopen-vsx.org%2Fapi%2Fpub%2Fext%2F1.2.3%2Ffile&name=pub.ext&version=1.2.3` |
 | VS Code Insiders | `vscode-insiders://` | 預覽版 | `vscode-insiders://github.remotehub/open?url=...` | `vscode-insiders://extension/install?url=...` |
-| Antigravity IDE | `antigravity://` | Antigravity 自訂協議 | `antigravity://git/open?url=https%3A%2F%2Fgithub.com%2Fmcp%2Fupstash%2Fcontext7` | `antigravity://extension/install?url={VSIX_URL}&name={publisher.ext}` |
-| Cursor AI IDE | `cursor://` | AI first IDE | `cursor://repo/open?url=https%3A%2F%2Fgithub.com%2Fmcp%2Fupstash%2Fcontext7` | `cursor://extension/install?url={VSIX_URL}&name={publisher.ext}` |
-| Windsurf Codeium | `windsurf://` | Codeium IDE | `windsurf://repo/open?url=https%3A%2F%2Fgithub.com%2Fmcp%2Fupstash%2Fcontext7` | `windsurf://extension/install?url={VSIX_URL}&name={publisher.ext}` |
+| Antigravity IDE | `antigravity://` | Antigravity 自訂協議 | `antigravity://git/open?url=https%3A%2F%2Fgithub.com%2Fmcp%2Fupstash%2Fcontext7` | `antigravity://extension/install?url={VSIX_URL}&name={publisher}.{extension}` |
+| Cursor AI IDE | `cursor://` | AI first IDE | `cursor://repo/open?url=https%3A%2F%2Fgithub.com%2Fmcp%2Fupstash%2Fcontext7` | `cursor://extension/install?url={VSIX_URL}&name={publisher}.{extension}` |
+| Windsurf Codeium | `windsurf://` | Codeium IDE | `windsurf://repo/open?url=https%3A%2F%2Fgithub.com%2Fmcp%2Fupstash%2Fcontext7` | `windsurf://extension/install?url={VSIX_URL}&name={publisher}.{extension}` |
+
+---
+
+### 注意事項：Antigravity 擴充 URL 格式
+
+Antigravity IDE 的擴充安裝連結格式與其他 VS Code 系列 IDE 不同：
+
+**從 Marketplace 安裝擴充（`vscode:extension/id` 連結）**：
+- **Antigravity**: `antigravity://{publisher}.{extension}` (擴充 ID 直接作為 authority)
+- **其他 IDE**: `{protocol}:extension/{publisher}.{extension}` (擴充 ID 作為 path)
+
+範例：
+- Antigravity: `antigravity://esbenp.prettier-vscode`
+- VS Code: `vscode:extension/esbenp.prettier-vscode`
+- Cursor: `cursor:extension/esbenp.prettier-vscode`
+
+**從 VSIX 檔案安裝（`.vsix` 下載連結）**：
+- 所有 IDE（包括 Antigravity）都使用相同格式：
+  `{protocol}://extension/install?url={VSIX_URL}&name={publisher}.{extension}`
 
 ---
 
@@ -96,7 +115,7 @@
   - Antigravity 安裝範例（已編碼）
 
     ```
-    antigravity://extension/install?url=https%3A%2F%2Fopen-vsx.org%2Fapi%2Fpub%2Fext%2F1.2.3%2Ffile&name=pub.ext&version=1.2.3
+    antigravity://extension/install?url=https%3A%2F%2Fopen-vsx.org%2Fapi%2Fpub%2Fext%2F1.2.3%2Ffile&name=publisher.extension&version=1.2.3
     ```
 
 - **若編輯器不支援協議**
@@ -148,8 +167,14 @@
   cursor://repo/open?url=https%3A%2F%2Fgithub.com%2Fmcp%2Fupstash%2Fcontext7&branch=main&path=context7
   ```
 
+- **在 Antigravity 安裝 Marketplace 擴充 (特殊格式)**
+
+  ```
+  antigravity://esbenp.prettier-vscode
+  ```
+
 - **在 Antigravity 安裝來自 Open VSX 的 VSIX**
 
   ```
-  antigravity://extension/install?url=https%3A%2F%2Fopen-vsx.org%2Fapi%2Fpub%2Fext%2F1.2.3%2Ffile&name=pub.ext&version=1.2.3
+  antigravity://extension/install?url=https%3A%2F%2Fopen-vsx.org%2Fapi%2Fpub%2Fext%2F1.2.3%2Ffile&name=publisher.extension&version=1.2.3
   ```

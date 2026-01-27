@@ -353,21 +353,25 @@
         
         if (response && response.success) {
           console.log('[IDE Switcher] 擴充功能安裝成功');
-        } else if (response && response.error === 'Native Host not installed') {
-          // Native Host 未安裝，回退到 protocol URL
-          console.log('[IDE Switcher] Native Host 未安裝，嘗試使用 protocol URL');
-          const protocolUrl = `${getProtocolPrefix()}extension/${extensionId}`;
-          console.log(`[IDE Switcher] 重定向至: ${protocolUrl}`);
-          window.location.href = protocolUrl;
+         } else if (response && response.error === 'Native Host not installed') {
+           // Native Host 未安裝，回退到 protocol URL
+           console.log('[IDE Switcher] Native Host 未安裝，嘗試使用 protocol URL');
+           const protocolUrl = targetProtocol === 'antigravity' 
+             ? `antigravity://${extensionId}` 
+             : `${getProtocolPrefix()}extension/${extensionId}`;
+           console.log(`[IDE Switcher] 重定向至: ${protocolUrl}`);
+           window.location.href = protocolUrl;
         } else {
           console.error('[IDE Switcher] 安裝失敗:', response?.error);
         }
-      } catch (err) {
-        // 通訊失敗，回退到 protocol URL
-        console.error('[IDE Switcher] 無法連接 background script:', err);
-        const protocolUrl = `${getProtocolPrefix()}extension/${extensionId}`;
-        console.log(`[IDE Switcher] 回退到 protocol URL: ${protocolUrl}`);
-        window.location.href = protocolUrl;
+       } catch (err) {
+         // 通訊失敗，回退到 protocol URL
+         console.error('[IDE Switcher] 無法連接 background script:', err);
+         const protocolUrl = targetProtocol === 'antigravity' 
+           ? `antigravity://${extensionId}` 
+           : `${getProtocolPrefix()}extension/${extensionId}`;
+         console.log(`[IDE Switcher] 回退到 protocol URL: ${protocolUrl}`);
+         window.location.href = protocolUrl;
       }
       return;
     }

@@ -271,8 +271,14 @@ function buildExtensionViewUrl(protocol, extInfo) {
   if (!extInfo?.publisher || !extInfo?.name) {
     return null;
   }
+  const extensionId = `${extInfo.publisher}.${extInfo.name}`;
+  
+  if (protocol === 'antigravity') {
+    return `antigravity://${extensionId}`;
+  }
+  
   const prefix = getProtocolPrefix(protocol);
-  return `${prefix}extension/${extInfo.publisher}.${extInfo.name}`;
+  return `${prefix}extension/${extensionId}`;
 }
 
 /**
@@ -346,7 +352,7 @@ async function handleMenuClick(info, tab) {
       
       // 嘗試使用 protocol URL (對於支援的 IDE)
       const viewUrl = buildExtensionViewUrl(protocol, extInfo);
-      if (viewUrl && protocol !== 'antigravity') {
+      if (viewUrl) {
         // 非 Antigravity 的 IDE 可能支援 protocol URL
         console.log(`[IDE Switcher] Trying protocol URL: ${viewUrl}`);
         chrome.tabs.update(tab.id, { url: viewUrl });
