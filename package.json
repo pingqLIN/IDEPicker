@@ -1,6 +1,6 @@
 {
-    "name": "ide-link-interceptor",
-    "version": "1.4.1",
+    "name": "idepicker",
+    "version": "1.7.0",
     "description": "Browser extension that intercepts IDE hyperlinks and lets you choose which IDE to open them with",
     "scripts": {
         "lint": "eslint extension/*.js",
@@ -12,10 +12,11 @@
         "chrome-extension",
         "browser-extension",
         "ide",
-        "link-interceptor",
+        "idepicker",
         "vscode",
         "cursor",
-        "windsurf"
+        "windsurf",
+        "antigravity"
     ],
     "author": "pingqLIN",
     "license": "MIT",

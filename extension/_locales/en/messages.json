@@ -1,10 +1,10 @@
 {
     "extName": {
-        "message": "IDE Link Interceptor",
+        "message": "IDEPicker",
         "description": "Extension name"
     },
     "extDescription": {
-        "message": "Browser extension that intercepts IDE hyperlinks (vscode://, cursor://, windsurf://) and lets you choose which IDE to open them with",
+        "message": "Intercept IDE protocol links and open them in your preferred editor. Supports vscode://, cursor://, windsurf://, and more.",
         "description": "Extension description"
     },
     "actionTitle": {

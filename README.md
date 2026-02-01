@@ -8,7 +8,7 @@
 
 [![CI](https://github.com/pingqLIN/IDE-Link-Interceptor/actions/workflows/ci.yml/badge.svg)](https://github.com/pingqLIN/IDE-Link-Interceptor/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/badge/version-1.6.0-blue.svg)](https://github.com/pingqLIN/IDE-Link-Interceptor/releases)
+[![Version](https://img.shields.io/badge/version-1.7.0-blue.svg)](https://github.com/pingqLIN/IDE-Link-Interceptor/releases)
 [![Chrome MV3](https://img.shields.io/badge/Chrome-MV3-green.svg)](https://developer.chrome.com/docs/extensions/mv3/)
 
 [中文版](README.zh-TW.md) · [Report Bug](https://github.com/pingqLIN/IDE-Link-Interceptor/issues) · [Request Feature](https://github.com/pingqLIN/IDE-Link-Interceptor/issues)

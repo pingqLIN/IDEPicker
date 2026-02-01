@@ -1,10 +1,10 @@
 {
     "extName": {
-        "message": "IDE 連結攔截器",
+        "message": "IDEPicker",
         "description": "Extension name"
     },
     "extDescription": {
-        "message": "瀏覽器擴充功能，攔截 IDE 協議連結（vscode://、cursor://、windsurf://），讓你選擇要用哪個 IDE 開啟",
+        "message": "攔截 IDE 協議連結，以你偏好的編輯器開啟。支援 vscode://、cursor://、windsurf:// 等協議。",
         "description": "Extension description"
     },
     "actionTitle": {
