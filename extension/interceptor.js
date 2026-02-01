@@ -88,10 +88,10 @@
     }
 
     // 處理 Cursor 專屬格式轉換為其他 IDE
-    if (url.includes('cursor://anysphere.cursor-deeplink/mcp/install') || 
-        url.includes('cursor://-deeplink/mcp/install')) {
+    if (url.includes('cursor://anysphere.cursor-deeplink/mcp/install') ||
+      url.includes('cursor://-deeplink/mcp/install')) {
       try {
-        const urlPart = url.includes('anysphere.cursor-deeplink') 
+        const urlPart = url.includes('anysphere.cursor-deeplink')
           ? url.split('cursor://anysphere.cursor-deeplink/mcp/install')[1]
           : url.split('cursor://-deeplink/mcp/install')[1];
         const params = new URLSearchParams(urlPart.startsWith('?') ? urlPart.slice(1) : urlPart);
@@ -102,11 +102,11 @@
           // 解碼 base64 配置
           const configJson = atob(configBase64);
           const config = JSON.parse(configJson);
-          
+
           // 建立標準 MCP 配置
           const mcpConfig = name ? { name, ...config } : config;
           const encodedConfig = encodeURIComponent(JSON.stringify(mcpConfig));
-          
+
           return `${getMcpProtocolPrefix()}mcp/install?${encodedConfig}`;
         }
       } catch (e) {
@@ -150,7 +150,7 @@
         // eslint-disable-next-line no-unused-vars
         const { name: _removed, ...configWithoutName } = mcpConfig;
         const configBase64 = btoa(JSON.stringify(configWithoutName));
-        
+
         return `cursor://anysphere.cursor-deeplink/mcp/install?name=${encodeURIComponent(name)}&config=${configBase64}`;
       }
     } catch (e) {
@@ -265,68 +265,90 @@
   }
 
   // 攔截 window.location.href 設定
-  const originalDescriptor = Object.getOwnPropertyDescriptor(window.location.__proto__, 'href') ||
-    Object.getOwnPropertyDescriptor(window.Location.prototype, 'href');
+  try {
+    const originalDescriptor = Object.getOwnPropertyDescriptor(window.location.__proto__, 'href') ||
+      Object.getOwnPropertyDescriptor(window.Location.prototype, 'href');
 
-  if (originalDescriptor && originalDescriptor.set) {
-    Object.defineProperty(window.location, 'href', {
-      get: originalDescriptor.get,
-      set: function (value) {
-        if (needsInterception(value)) {
-          const newUrl = processUrl(value);
-          if (newUrl && newUrl !== value) {
-            console.log('[IDE Switcher] 攔截 JS 導航: ' + value);
-            console.log('[IDE Switcher] 重定向至: ' + newUrl);
-            value = newUrl;
+    if (originalDescriptor && originalDescriptor.set) {
+      Object.defineProperty(window.location, 'href', {
+        get: originalDescriptor.get,
+        set: function (value) {
+          if (needsInterception(value)) {
+            const newUrl = processUrl(value);
+            if (newUrl && newUrl !== value) {
+              console.log('[IDE Switcher] 攔截 JS 導航: ' + value);
+              console.log('[IDE Switcher] 重定向至: ' + newUrl);
+              value = newUrl;
+            }
           }
-        }
-        originalDescriptor.set.call(this, value);
-      },
-      configurable: true
-    });
+          originalDescriptor.set.call(this, value);
+        },
+        configurable: true
+      });
+    }
+  } catch (e) {
+    console.log('[IDE Switcher] 無法攔截 location.href (可能在受限頁面)', e);
   }
 
   // 攔截 window.location.assign (透過 Location.prototype)
-  const originalAssign = Location.prototype.assign;
-  Location.prototype.assign = function (url) {
-    if (needsInterception(url)) {
-      const newUrl = processUrl(url);
-      if (newUrl && newUrl !== url) {
-        console.log('[IDE Switcher] 攔截 assign: ' + url);
-        console.log('[IDE Switcher] 重定向至: ' + newUrl);
-        url = newUrl;
+  try {
+    const originalAssign = Location.prototype.assign;
+    Location.prototype.assign = function (url) {
+      if (needsInterception(url)) {
+        const newUrl = processUrl(url);
+        if (newUrl && newUrl !== url) {
+          console.log('[IDE Switcher] 攔截 assign: ' + url);
+          console.log('[IDE Switcher] 重定向至: ' + newUrl);
+          url = newUrl;
+        }
       }
-    }
-    return originalAssign.call(this, url);
-  };
+      return originalAssign.call(this, url);
+    };
+  } catch (e) {
+    console.log('[IDE Switcher] 無法攔截 location.assign', e);
+  }
 
   // 攔截 window.location.replace (透過 Location.prototype)
-  const originalReplace = Location.prototype.replace;
-  Location.prototype.replace = function (url) {
-    if (needsInterception(url)) {
-      const newUrl = processUrl(url);
-      if (newUrl && newUrl !== url) {
-        console.log('[IDE Switcher] 攔截 replace: ' + url);
-        console.log('[IDE Switcher] 重定向至: ' + newUrl);
-        url = newUrl;
+  try {
+    const originalReplace = Location.prototype.replace;
+    Location.prototype.replace = function (url) {
+      if (needsInterception(url)) {
+        const newUrl = processUrl(url);
+        if (newUrl && newUrl !== url) {
+          console.log('[IDE Switcher] 攔截 replace: ' + url);
+          console.log('[IDE Switcher] 重定向至: ' + newUrl);
+          url = newUrl;
+        }
       }
-    }
-    return originalReplace.call(this, url);
-  };
+      return originalReplace.call(this, url);
+    };
+  } catch (e) {
+    console.log('[IDE Switcher] 無法攔截 location.replace', e);
+  }
 
   // 攔截 window.open
-  const originalOpen = window.open;
-  window.open = function (url, ...args) {
-    if (needsInterception(url)) {
-      const newUrl = processUrl(url);
-      if (newUrl && newUrl !== url) {
-        console.log('[IDE Switcher] 攔截 window.open: ' + url);
-        console.log('[IDE Switcher] 重定向至: ' + newUrl);
-        url = newUrl;
-      }
+  try {
+    const originalOpen = window.open;
+    // 檢查 window.open 是否可寫入
+    const openDescriptor = Object.getOwnPropertyDescriptor(window, 'open');
+    if (!openDescriptor || openDescriptor.configurable || openDescriptor.writable) {
+      window.open = function (url, ...args) {
+        if (needsInterception(url)) {
+          const newUrl = processUrl(url);
+          if (newUrl && newUrl !== url) {
+            console.log('[IDE Switcher] 攔截 window.open: ' + url);
+            console.log('[IDE Switcher] 重定向至: ' + newUrl);
+            url = newUrl;
+          }
+        }
+        if (originalOpen) {
+          return originalOpen.call(this, url, ...args);
+        }
+      };
     }
-    return originalOpen.call(this, url, ...args);
-  };
+  } catch (e) {
+    console.log('[IDE Switcher] 無法攔截 window.open', e);
+  }
 
   console.log('[IDE Switcher] JS 攔截器已就緒');
 })();
