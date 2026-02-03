@@ -67,13 +67,13 @@
 
 ## 🎯 支援的 IDE
 
-| IDE | 協議 | 狀態 |
-|:---|:---|:---:|
-| **VS Code** | `vscode://` | ✅ 穩定版 |
-| **VS Code Insiders** | `vscode-insiders://` | ✅ 預覽版 |
-| **Antigravity** | `antigravity://` | ✅ 已支援 |
-| **Cursor** | `cursor://` | ✅ AI 優先 |
-| **Windsurf** | `windsurf://` | ✅ Codeium |
+| IDE | 協議 | 狀態 | 支援度 |
+|:---|:---|:---:|:---:|
+| **VS Code** | `vscode://` | ✅ 穩定版 | 完成測試 |
+| **VS Code Insiders** | `vscode-insiders://` | ✅ 預覽版 | 完成測試 |
+| **Antigravity** | `antigravity://` | ✅ 已支援 | 完成測試 |
+| **Cursor** | `cursor://` | ✅ AI 優先 | 尚未完全測試 |
+| **Windsurf** | `windsurf://` | ✅ Codeium | 尚未完全測試 |
 
 ---
 
