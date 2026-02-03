@@ -179,7 +179,7 @@ npm run validate
 
 | 目標 IDE | 輸入 | 預期輸出 |
 |:---|:---|:---|
-| Antigravity | `vscode:extension/ms-python.python` | `antigravity://extension/ms-python.python` |
+| Antigravity | `vscode:extension/ms-python.python` | `antigravity://ms-python.python` |
 | Cursor | `vscode:extension/ms-python.python` | `cursor:extension/ms-python.python` |
 | VS Code | `cursor:extension/ms-python.python` | `vscode:extension/ms-python.python` |
 | Antigravity | `vscode://file/path` | `antigravity://file/path` |
