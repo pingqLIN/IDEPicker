@@ -84,8 +84,8 @@ IDEPicker is a browser extension that intercepts IDE hyperlinks (`vscode://`, `c
 |-----|----------|:------:|-------|
 | VS Code | `vscode://` | ✅ | 完成測試 |
 | VS Code Insiders | `vscode-insiders://` | ✅ | 完成測試 |
-| Cursor | `cursor://` | ✅ | 尚未完全測試 |
-| Windsurf | `windsurf://` | ✅ | 尚未完全測試 |
+| Cursor | `cursor://` | ⚠️ | 尚未完全測試 |
+| Windsurf | `windsurf://` | ⚠️ | 尚未完全測試 |
 | Antigravity | `antigravity://` | ✅ | 完成測試 |
 
 ---
