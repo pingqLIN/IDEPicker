@@ -157,6 +157,8 @@ This extension requires the following permissions:
 
 ## 🧪 Testing
 
+### Quick Tests
+
 Try these websites to test the extension:
 
 | Website | Test Action |
@@ -164,6 +166,27 @@ Try these websites to test the extension:
 | [GitHub MCP](https://github.com/mcp) | Click "Install MCP server" buttons |
 | [VS Code Marketplace](https://marketplace.visualstudio.com/) | Click extension "Install" buttons |
 | [Open VSX Registry](https://open-vsx.org/) | Download `.vsix` files |
+
+### Extension Install Links
+
+Test these direct extension installation links to verify protocol conversion:
+
+- **Python Extension**: `vscode:extension/ms-python.python` - Python language support from VS Code Marketplace
+- **Prettier Extension**: `vscode:extension/esbenp.prettier-vscode` - Code formatter from VS Code Marketplace  
+- **GitHub Copilot**: `vscode-insiders:extension/GitHub.copilot` - AI programming assistant from VS Code Marketplace
+
+### Expected URL Conversions
+
+| Target IDE | Input | Expected Output |
+|:---|:---|:---|
+| Antigravity | `vscode:extension/ms-python.python` | `antigravity://extension/ms-python.python` |
+| Cursor | `vscode:extension/ms-python.python` | `cursor:extension/ms-python.python` |
+| VS Code | `cursor:extension/ms-python.python` | `vscode:extension/ms-python.python` |
+| Antigravity | `vscode://file/path` | `antigravity://file/path` |
+
+### Complete Test Page
+
+For comprehensive testing including JavaScript navigation and all link types, visit the [complete test page](test/test-links.html). You can also view the [Chinese version](test/test-links.zh-TW.html).
 
 ---
 

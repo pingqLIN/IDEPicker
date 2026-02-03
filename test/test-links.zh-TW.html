@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>IDE Link Interceptor - Test Page</title>
+  <title>IDE 連結攔截器 - 測試頁面</title>
   <style>
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -91,84 +91,84 @@
 </head>
 <body>
   <div class="language-toggle">
-    <a href="test-links.zh-TW.html">中文版 / Chinese Version</a>
+    <a href="test-links.html">English Version / 英文版</a>
   </div>
 
-  <h1>IDE Link Interceptor - Test Page</h1>
+  <h1>IDE 連結攔截器 - 測試頁面</h1>
   
   <div class="warning">
-    <strong>Instructions:</strong>
+    <strong>使用說明：</strong>
     <ol>
-      <li>Open Chrome DevTools (F12) and switch to Console tab</li>
-      <li>Click the extension icon and select your target IDE (e.g., Antigravity)</li>
-      <li>Click each test link below and observe the console logs</li>
-      <li>Look for <code>[IDE Switcher]</code> messages showing the URL conversion</li>
+      <li>開啟 Chrome 開發者工具（F12）並切換到主控台分頁</li>
+      <li>點擊擴充功能圖示並選擇你的目標 IDE（例如：Antigravity）</li>
+      <li>點擊下方的每個測試連結並觀察主控台日誌</li>
+      <li>尋找顯示 URL 轉換的 <code>[IDE Switcher]</code> 訊息</li>
     </ol>
   </div>
 
   <div class="section">
-    <h2>1. Extension Install Links (vscode:extension/...)</h2>
-    <p class="description">These links should open the extension page in your target IDE. These are links from extension provider websites such as VS Code Marketplace.</p>
+    <h2>1. 擴充功能安裝連結 (vscode:extension/...)</h2>
+    <p class="description">這些連結應該在你的目標 IDE 中開啟擴充功能頁面。這些是來自 VS Code Marketplace 等擴充功能提供網站的連結。</p>
     
     <a href="vscode:extension/ms-python.python" class="test-link">
-      Python Extension <code>vscode:extension/ms-python.python</code>
-      <div class="description">Python language support extension from VS Code Marketplace</div>
+      Python 擴充功能 <code>vscode:extension/ms-python.python</code>
+      <div class="description">來自 VS Code Marketplace 的 Python 語言支援擴充功能</div>
     </a>
     
     <a href="vscode:extension/esbenp.prettier-vscode" class="test-link">
-      Prettier Extension <code>vscode:extension/esbenp.prettier-vscode</code>
-      <div class="description">Code formatter extension from VS Code Marketplace</div>
+      Prettier 擴充功能 <code>vscode:extension/esbenp.prettier-vscode</code>
+      <div class="description">來自 VS Code Marketplace 的程式碼格式化工具擴充功能</div>
     </a>
     
     <a href="vscode-insiders:extension/GitHub.copilot" class="test-link">
       GitHub Copilot <code>vscode-insiders:extension/GitHub.copilot</code>
-      <div class="description">AI programming assistant extension from VS Code Marketplace</div>
+      <div class="description">來自 VS Code Marketplace 的 AI 程式設計助手擴充功能</div>
     </a>
   </div>
 
   <div class="section">
-    <h2>2. File Open Links (vscode://file/...)</h2>
-    <p class="description">These links should open a file in your target IDE.</p>
+    <h2>2. 檔案開啟連結 (vscode://file/...)</h2>
+    <p class="description">這些連結應該在你的目標 IDE 中開啟檔案。</p>
     
     <a href="vscode://file/C:/test/example.py:10:5" class="test-link">
-      Open File (Windows) <code>vscode://file/C:/test/example.py:10:5</code>
-      <div class="description">Opens file at line 10, column 5 with Windows path</div>
+      開啟檔案（Windows）<code>vscode://file/C:/test/example.py:10:5</code>
+      <div class="description">在第 10 行第 5 列開啟 Windows 路徑的檔案</div>
     </a>
     
     <a href="vscode://file//home/user/project/main.py" class="test-link">
-      Open File (Linux) <code>vscode://file//home/user/project/main.py</code>
-      <div class="description">Opens file with Linux path</div>
+      開啟檔案（Linux）<code>vscode://file//home/user/project/main.py</code>
+      <div class="description">開啟 Linux 路徑的檔案</div>
     </a>
   </div>
 
   <div class="section">
-    <h2>3. MCP Install Links</h2>
-    <p class="description">These links should trigger MCP server installation.</p>
+    <h2>3. MCP 安裝連結</h2>
+    <p class="description">這些連結應該觸發 MCP 伺服器安裝。</p>
     
     <a href="vscode:mcp/install?%7B%22name%22%3A%22test-server%22%2C%22type%22%3A%22http%22%2C%22url%22%3A%22https%3A%2F%2Fexample.com%2Fmcp%22%7D" class="test-link">
-      MCP HTTP Server <code>vscode:mcp/install?{...}</code>
-      <div class="description">Tests MCP server installation link redirection</div>
+      MCP HTTP 伺服器 <code>vscode:mcp/install?{...}</code>
+      <div class="description">測試 MCP 伺服器安裝連結重新導向</div>
     </a>
   </div>
 
   <div class="section">
-    <h2>4. JavaScript Navigation Tests</h2>
-    <p class="description">Test JavaScript-triggered navigation (interceptor.js).</p>
+    <h2>4. JavaScript 導航測試</h2>
+    <p class="description">測試 JavaScript 觸發的導航（interceptor.js）。</p>
     
-    <button onclick="testLocationHref()">Test location.href</button>
-    <button onclick="testLocationAssign()">Test location.assign()</button>
-    <button onclick="testWindowOpen()">Test window.open()</button>
+    <button onclick="testLocationHref()">測試 location.href</button>
+    <button onclick="testLocationAssign()">測試 location.assign()</button>
+    <button onclick="testWindowOpen()">測試 window.open()</button>
     
-    <div id="result">Click a button to test JavaScript navigation...</div>
+    <div id="result">點擊按鈕測試 JavaScript 導航...</div>
   </div>
 
   <div class="section">
-    <h2>5. Expected URL Conversions</h2>
+    <h2>5. 預期的 URL 轉換</h2>
     <table style="width: 100%; border-collapse: collapse;">
       <tr style="background: #3c3c3c;">
-        <th style="padding: 10px; text-align: left;">Target IDE</th>
-        <th style="padding: 10px; text-align: left;">Input</th>
-        <th style="padding: 10px; text-align: left;">Expected Output</th>
+        <th style="padding: 10px; text-align: left;">目標 IDE</th>
+        <th style="padding: 10px; text-align: left;">輸入</th>
+        <th style="padding: 10px; text-align: left;">預期輸出</th>
       </tr>
       <tr>
         <td style="padding: 10px;">Antigravity</td>
@@ -194,11 +194,11 @@
   </div>
 
   <div class="success">
-    <strong>What to check:</strong>
+    <strong>檢查項目：</strong>
     <ul>
-      <li>Console shows <code>[IDE Switcher] 攔截擴充連結: ...</code></li>
-      <li>Console shows <code>[IDE Switcher] 重定向至: antigravity://...</code> (for Antigravity)</li>
-      <li>Your IDE should launch and open the extension page</li>
+      <li>主控台顯示 <code>[IDE Switcher] 攔截擴充連結: ...</code></li>
+      <li>主控台顯示 <code>[IDE Switcher] 重定向至: antigravity://...</code>（針對 Antigravity）</li>
+      <li>你的 IDE 應該啟動並開啟擴充功能頁面</li>
     </ul>
   </div>
 
@@ -206,7 +206,7 @@
     function testLocationHref() {
       const url = 'vscode:extension/ms-python.python';
       document.getElementById('result').textContent = 
-        `Testing: window.location.href = "${url}"\n\nCheck console for [IDE Switcher] logs...`;
+        `測試中: window.location.href = "${url}"\n\n請檢查主控台的 [IDE Switcher] 日誌...`;
       
       // Slight delay to show the message
       setTimeout(() => {
@@ -217,7 +217,7 @@
     function testLocationAssign() {
       const url = 'vscode:extension/esbenp.prettier-vscode';
       document.getElementById('result').textContent = 
-        `Testing: window.location.assign("${url}")\n\nCheck console for [IDE Switcher] logs...`;
+        `測試中: window.location.assign("${url}")\n\n請檢查主控台的 [IDE Switcher] 日誌...`;
       
       setTimeout(() => {
         window.location.assign(url);
@@ -227,7 +227,7 @@
     function testWindowOpen() {
       const url = 'vscode://file/C:/test/example.py';
       document.getElementById('result').textContent = 
-        `Testing: window.open("${url}")\n\nCheck console for [IDE Switcher] logs...\n\n(Note: This may be blocked by popup blocker)`;
+        `測試中: window.open("${url}")\n\n請檢查主控台的 [IDE Switcher] 日誌...\n\n（注意：這可能會被彈出視窗攔截器阻擋）`;
       
       setTimeout(() => {
         window.open(url);

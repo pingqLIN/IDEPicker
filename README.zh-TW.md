@@ -157,6 +157,8 @@ npm run validate
 
 ## 🧪 測試網站
 
+### 快速測試
+
 使用這些網站來測試擴充套件：
 
 | 網站 | 測試動作 |
@@ -164,6 +166,27 @@ npm run validate
 | [GitHub MCP](https://github.com/mcp) | 點擊「Install MCP server」按鈕 |
 | [VS Code Marketplace](https://marketplace.visualstudio.com/) | 點擊擴充套件「Install」按鈕 |
 | [Open VSX Registry](https://open-vsx.org/) | 下載 `.vsix` 檔案 |
+
+### 擴充功能安裝連結
+
+測試這些直接的擴充功能安裝連結以驗證協議轉換：
+
+- **Python 擴充功能**：`vscode:extension/ms-python.python` - 來自 VS Code Marketplace 的 Python 語言支援
+- **Prettier 擴充功能**：`vscode:extension/esbenp.prettier-vscode` - 來自 VS Code Marketplace 的程式碼格式化工具
+- **GitHub Copilot**：`vscode-insiders:extension/GitHub.copilot` - 來自 VS Code Marketplace 的 AI 程式設計助手
+
+### 預期的 URL 轉換
+
+| 目標 IDE | 輸入 | 預期輸出 |
+|:---|:---|:---|
+| Antigravity | `vscode:extension/ms-python.python` | `antigravity://extension/ms-python.python` |
+| Cursor | `vscode:extension/ms-python.python` | `cursor:extension/ms-python.python` |
+| VS Code | `cursor:extension/ms-python.python` | `vscode:extension/ms-python.python` |
+| Antigravity | `vscode://file/path` | `antigravity://file/path` |
+
+### 完整測試頁面
+
+如需進行完整測試，包括 JavaScript 導航和所有連結類型，請造訪[完整測試頁面](test/test-links.html)。您也可以查看[中文版](test/test-links.zh-TW.html)。
 
 ---
 
