@@ -1,10 +1,12 @@
 <div align="center">
 
-<img src="extension/icons/logo.png" width="128" alt="IDEPicker">
+<img src="extension/icons/logo.png" width="128" alt="IDEPicker Logo">
 
 # IDEPicker
 
-**Intercept IDE protocol links and open them in your preferred editor**
+**Intercept IDE protocol links and open them in your preferred editor.**
+<br>
+不再受限於瀏覽器預設，自由選擇開啟 VS Code、Cursor 或 Windsurf。
 
 [![CI](https://github.com/pingqLIN/IDE-Link-Interceptor/actions/workflows/ci.yml/badge.svg)](https://github.com/pingqLIN/IDE-Link-Interceptor/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -17,252 +19,128 @@
 
 ---
 
-## 🎬 Demo
+## 🎬 Quick Preview
 
 <div align="center">
 
 | Popup Interface | Context Menu |
 |:---:|:---:|
 | <img src="docs/screenshot-popup.png" width="280" alt="Popup Interface"/> | <img src="docs/screenshot-context-menu.png" width="360" alt="Context Menu"/> |
-| *Click extension icon to select IDE* | *Right-click for quick access* |
+| **One-click Selection** | **Right-click Access** |
 
-## ✨ Highlights
+</div>
 
-<table>
-<tr>
-<td width="50%">
+<br>
 
-### 🔗 Protocol Interception
+## ✨ Why IDEPicker?
 
-Captures `vscode://`, `cursor://`, `windsurf://` and other IDE protocol links automatically
-
-### 🎯 IDE Selection
-
-Choose your preferred IDE from a sleek popup or context menu
-
-### 🚫 No Browser Prompts
-
-Eliminates the annoying "Open Visual Studio Code?" dialog
-
-</td>
-<td width="50%">
-
-### 📦 Extension Installation
-
-Opens VS Code Marketplace extensions in your chosen IDE; supports `.vsix` direct installation
-
-### 🔧 MCP Server Support
-
-Intercepts MCP install links and redirects to your IDE of choice
-
-### 💾 Persistent Settings
-
-Your IDE selection is saved and synced across browsing sessions
-
-</td>
-</tr>
-</table>
+- **🔗 Smart Interception**: Automatically captures `vscode://`, `cursor://`, `windsurf://` and redirects them to your chosen tool.
+- **🎯 Flexible Selection**: Switch between VS Code, Cursor, or Antigravity instantly via a sleek popup.
+- **🚫 Silence the Noise**: Eliminates the annoying *"Open Visual Studio Code?"* browser confirmation dialog.
+- **📦 Seamless Installation**: Supports one-click installation for `.vsix` files and Marketplace extensions.
+- **🔧 MCP Ready**: Fully supports Model Context Protocol (MCP) server installation links.
 
 ---
 
 ## 🎯 Supported IDEs
 
-| IDE | Protocol | Status |
-|:---|:---|:---:|
-| **VS Code** | `vscode://` | ✅ Stable |
-| **VS Code Insiders** | `vscode-insiders://` | ✅ Preview |
-| **Antigravity** | `antigravity://` | ✅ Supported |
-| **Cursor** | `cursor://` | ✅ AI-First |
-| **Windsurf** | `windsurf://` | ✅ Codeium |
+| IDE | Protocol | Status | Notes |
+|:---|:---|:---:|:---|
+| **VS Code** | `vscode://` | ✅ Stable | Standard Edition |
+| **VS Code Insiders** | `vscode-insiders://` | ✅ Preview | For early adopters |
+| **Antigravity** | `antigravity://` | ✅ Supported | Full support |
+| **Cursor** | `cursor://` | ✅ AI-First | AI Code Editor |
+| **Windsurf** | `windsurf://` | ✅ Codeium | Codeium Integration |
 
 ---
 
 ## 📦 Installation
 
-### Chrome / Edge / Brave
+### Option 1: Load Unpacked (Recommended)
 
-1. Download the latest release or clone this repository
-2. Navigate to `chrome://extensions/` (or `edge://extensions/` for Edge)
-3. Enable **Developer mode** in the top right corner
-4. Click **Load unpacked**
-5. Select the `extension/` folder (contains `manifest.json`)
+1. Download the [latest release](https://github.com/pingqLIN/IDE-Link-Interceptor/releases) or clone this repo.
+2. Go to `chrome://extensions/` (or `edge://extensions/`).
+3. Enable **Developer mode** (Top right corner).
+4. Click **Load unpacked** and select the `extension/` folder.
 
-### From Source
+### Option 2: Build from Source
 
 ```bash
 # Clone the repository
-git clone https://github.com/pingqLIN/IDE-Link-Interceptor.git
+git clone [https://github.com/pingqLIN/IDE-Link-Interceptor.git](https://github.com/pingqLIN/IDE-Link-Interceptor.git)
 cd IDE-Link-Interceptor
 
-# Install dependencies
+# Install dependencies & Validate
 npm install
-
-# Validate the extension
 npm run validate
 ```
 
 ---
 
-## 🚀 Usage
+## 🚀 Usage Guide
 
-### Method 1: Extension Popup
+### 1. Extension Popup
+Click the extension icon <img src="extension/icons/logo.png" width="16" style="vertical-align:middle"> to select your default IDE. Your choice is saved automatically.
 
-1. Click the extension icon in the browser toolbar
-2. Select your target IDE from the list
-3. Your choice is automatically saved ✓
+### 2. Context Menu
+Right-click on any link or page > Hover over **🔗 Select Target IDE**.
 
-### Method 2: Context Menu
+### 3. Installing Extensions (VSIX / Marketplace)
+* **Marketplace**: Click "Install" on the VS Code Marketplace. IDEPicker will intercept and open it in your target IDE (e.g., Cursor).
+* **Direct Download**: Right-click a `.vsix` link > **📦 Install extension with [IDE Name]**.
 
-1. Right-click on any link or page
-2. Hover over **🔗 Select Target IDE**
-3. Select your preferred IDE
-
-> 💡 **Tip:** The extension automatically displays menu text in your browser's language (English/Traditional Chinese)
-
-### Method 3: VSIX Installation
-
-1. Right-click on a `.vsix` download link
-2. Click **📦 Install extension with [IDE Name]**
-3. The extension will be installed in your chosen IDE
-
-### Method 4: Marketplace Extensions
-
-When you click "Install" on VS Code Marketplace or similar sites:
-
-1. The extension intercepts the `vscode:extension/...` link
-2. Converts the protocol to your target IDE (e.g., `antigravity:extension/...`)
-3. Your IDE opens and displays the extension page
-4. Click "Install" inside the IDE to complete
-
-> ⚠️ **Note:** All VS Code-based IDEs require a second click inside the IDE for security reasons. This is a platform limitation, not a bug.
+> [!NOTE]
+> **A Note on Security**: All VS Code-based IDEs require a second click *inside* the IDE to confirm installation. This is a platform security feature, not a bug.
 
 ---
 
-## 🔐 Permissions
+## 🧪 Playground (Try it out)
 
-This extension requires the following permissions:
+Test the interception capabilities with these live links:
 
-| Permission | Purpose |
+| Type | Test Action |
 |:---|:---|
-| `storage` | Save your IDE preference across sessions |
-| `contextMenus` | Add right-click menu options |
-| `downloads` | Handle `.vsix` file installations |
-| `notifications` | Show installation status messages |
-| `nativeMessaging` | Communicate with native host for protocol registration |
-| `<all_urls>` | Intercept IDE protocol links on any webpage |
+| **MCP Server** | [Install GitHub MCP](https://github.com/mcp) |
+| **Extension** | [Install Python (Marketplace)](https://marketplace.visualstudio.com/items?itemName=ms-python.python) |
+| **Download** | [Download Open VSX (.vsix)](https://open-vsx.org/) |
 
-> 🔒 **Privacy:** This extension does not collect any personal data. All settings are stored locally in your browser.
-
----
-
-## 🧪 Testing
-
-### Quick Tests
-
-Try these websites to test the extension:
-
-| Website | Test Action |
-|:---|:---|
-| [GitHub MCP](https://github.com/mcp) | Click "Install MCP server" buttons |
-| [VS Code Marketplace](https://marketplace.visualstudio.com/) | Click extension "Install" buttons |
-| [Open VSX Registry](https://open-vsx.org/) | Download `.vsix` files |
-
-### Extension Install Links
-
-Test these direct extension installation links to verify protocol conversion:
-
-- **Python Extension**: `vscode:extension/ms-python.python` - Python language support from VS Code Marketplace
-- **Prettier Extension**: `vscode:extension/esbenp.prettier-vscode` - Code formatter from VS Code Marketplace  
-- **GitHub Copilot**: `vscode-insiders:extension/GitHub.copilot` - AI programming assistant from VS Code Marketplace
-
-### Expected URL Conversions
-
-| Target IDE | Input | Expected Output |
-|:---|:---|:---|
-| Antigravity | `vscode:extension/ms-python.python` | `antigravity://ms-python.python` |
-| Cursor | `vscode:extension/ms-python.python` | `cursor:extension/ms-python.python` |
-| VS Code | `cursor:extension/ms-python.python` | `vscode:extension/ms-python.python` |
-| Antigravity | `vscode://file/path` | `antigravity://file/path` |
-
-### Complete Test Page
-
-For comprehensive testing including JavaScript navigation and all link types, visit the [complete test page](test/test-links.html). You can also view the [Chinese version](test/test-links.zh-TW.html).
+> [!TIP]
+> **Protocol Conversion Example**:
+> If you select **Cursor** as your IDE, clicking a `vscode:extension/ms-python.python` link will automatically convert to `cursor:extension/ms-python.python`.
 
 ---
 
 ## 🛠️ Development
 
 ### Project Structure
-
-```
+```text
 IDE-Link-Interceptor/
-├── extension/          # Browser extension source
-│   ├── manifest.json   # Extension manifest (MV3)
+├── extension/          # Browser extension source (MV3)
 │   ├── background.js   # Service worker
 │   ├── content.js      # Content script
-│   ├── popup.*         # Popup UI
-│   └── _locales/       # i18n translations
+│   └── popup/          # UI Logic
 ├── native-host/        # Native messaging host
-├── docs/               # Documentation & screenshots
 └── scripts/            # Build & utility scripts
 ```
 
 ### Commands
-
 ```bash
-# Install dependencies
-npm install
-
-# Run linting
-npm run lint
-
-# Auto-fix code style
-npm run lint:fix
-
-# Validate manifest.json
-npm run validate
-
-# Package the extension
-npm run package
-```
-
-### CI/CD
-
-This project uses GitHub Actions:
-
-- **CI Workflow** (on every push/PR): Linting → Validation → Packaging → Artifact upload
-- **Release Workflow** (on tag push): Creates GitHub Release with packaged extension
-
-```bash
-# Create a new release
-git tag v1.6.0
-git push origin v1.6.0
+npm run lint      # Run ESLint
+npm run lint:fix  # Auto-fix code style
+npm run package   # Package extension for release
 ```
 
 ---
 
-## 🤝 Contributing
+## 🤝 Contributing & License
 
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
----
-
-## 📄 License
-
-Distributed under the MIT License. See [LICENSE](LICENSE) for more information.
-
----
+Contributions are welcome! Please open an issue or submit a PR.
+Distributed under the **MIT License**.
 
 <div align="center">
+<br>
 
-**Made with ❤️ for developers who use multiple IDEs**
+**Made with ❤️ for developers who multitask across IDEs.**
 
-[⬆ Back to top](#ide-link-interceptor)
-
+[⬆ Back to top](#idepicker)
 </div>
