@@ -1,146 +1,241 @@
-<div align="center">
+<p align="center">
+  <a href="https://github.com/pingqLIN/IDEPicker">
+    <img src="extension/icons/logo.png" width="160" alt="IDEPicker Logo">
+  </a>
+</p>
 
-<img src="extension/icons/logo.png" width="128" alt="IDEPicker Logo">
+<h1 align="center">IDEPicker</h1>
 
-# IDEPicker
+<p align="center">
+  <strong>Intercept IDE protocol links and open them in your preferred editor.</strong>
+</p>
 
-**Intercept IDE protocol links and open them in your preferred editor.**
-<br>
-不再受限於瀏覽器預設，自由選擇開啟 VS Code、Cursor 或 Windsurf。
+<p align="center">
+  <a href="https://github.com/pingqLIN/IDEPicker/actions/workflows/ci.yml"><img src="https://github.com/pingqLIN/IDEPicker/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a>
+  <a href="https://github.com/pingqLIN/IDEPicker/releases"><img src="https://img.shields.io/badge/version-1.7.0-blue.svg" alt="Version"></a>
+  <a href="https://developer.chrome.com/docs/extensions/mv3/"><img src="https://img.shields.io/badge/Chrome-MV3-green.svg" alt="Chrome MV3"></a>
+</p>
 
-[![CI](https://github.com/pingqLIN/IDE-Link-Interceptor/actions/workflows/ci.yml/badge.svg)](https://github.com/pingqLIN/IDE-Link-Interceptor/actions/workflows/ci.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/badge/version-1.7.0-blue.svg)](https://github.com/pingqLIN/IDE-Link-Interceptor/releases)
-[![Chrome MV3](https://img.shields.io/badge/Chrome-MV3-green.svg)](https://developer.chrome.com/docs/extensions/mv3/)
+<p align="center">
+  <a href="#installation">Installation</a> •
+  <a href="#features">Features</a> •
+  <a href="#usage">Usage</a> •
+  <a href="#supported-ides">Supported IDEs</a> •
+  <a href="#development">Development</a> •
+  <a href="#contributing">Contributing</a>
+</p>
 
-[中文版](README.zh-TW.md) · [Report Bug](https://github.com/pingqLIN/IDE-Link-Interceptor/issues) · [Request Feature](https://github.com/pingqLIN/IDE-Link-Interceptor/issues)
-
-</div>
-
----
-
-## 🎬 Quick Preview
-
-<div align="center">
-
-| Popup Interface | Context Menu |
-|:---:|:---:|
-| <img src="docs/screenshot-popup.png" width="280" alt="Popup Interface"/> | <img src="docs/screenshot-context-menu.png" width="360" alt="Context Menu"/> |
-| **One-click Selection** | **Right-click Access** |
-
-</div>
-
-<br>
-
-## ✨ Why IDEPicker?
-
-- **🔗 Smart Interception**: Automatically captures `vscode://`, `cursor://`, `windsurf://` and redirects them to your chosen tool.
-- **🎯 Flexible Selection**: Switch between VS Code, Cursor, or Antigravity instantly via a sleek popup.
-- **🚫 Silence the Noise**: Eliminates the annoying *"Open Visual Studio Code?"* browser confirmation dialog.
-- **📦 Seamless Installation**: Supports one-click installation for `.vsix` files and Marketplace extensions.
-- **🔧 MCP Ready**: Fully supports Model Context Protocol (MCP) server installation links.
+<p align="center">
+  <a href="README.zh-TW.md">中文版</a> · 
+  <a href="https://github.com/pingqLIN/IDEPicker/issues">Report Bug</a> · 
+  <a href="https://github.com/pingqLIN/IDEPicker/issues">Request Feature</a>
+</p>
 
 ---
 
-## 🎯 Supported IDEs
+## Overview
+
+IDEPicker is a browser extension that intercepts IDE hyperlinks (`vscode://`, `cursor://`, `windsurf://`) from web pages and lets you choose which IDE to open them with.
+
+- **Smart Interception** — Automatically captures and redirects IDE protocol links
+- **Flexible Selection** — Switch between multiple IDEs instantly via popup
+- **Silent Operation** — Eliminates browser confirmation dialogs
+- **MCP Ready** — Full support for Model Context Protocol server installation
+
+---
+
+## Quick Preview
+
+<p align="center">
+  <table>
+    <tr>
+      <th>Popup Interface</th>
+      <th>Context Menu</th>
+    </tr>
+    <tr>
+      <td align="center"><img src="docs/screenshot-popup.png" width="280" alt="Popup Interface"></td>
+      <td align="center"><img src="docs/screenshot-context-menu.png" width="360" alt="Context Menu"></td>
+    </tr>
+    <tr>
+      <td align="center"><em>One-click Selection</em></td>
+      <td align="center"><em>Right-click Access</em></td>
+    </tr>
+  </table>
+</p>
+
+---
+
+## Features
+
+| Feature | Description |
+|---------|-------------|
+| 🔗 **Protocol Interception** | Captures `vscode://`, `cursor://`, `windsurf://` links automatically |
+| 🎯 **IDE Switching** | Seamlessly switch between VS Code, Cursor, Windsurf, and more |
+| 🚫 **No Popups** | Bypasses annoying "Open Visual Studio Code?" browser dialogs |
+| 📦 **Extension Install** | One-click installation for `.vsix` files and Marketplace extensions |
+| 🔧 **MCP Support** | Fully supports Model Context Protocol server installation links |
+
+---
+
+## Supported IDEs
 
 | IDE | Protocol | Status | Notes |
-|:---|:---|:---:|:---|
-| **VS Code** | `vscode://` | ✅ Stable | Standard Edition |
-| **VS Code Insiders** | `vscode-insiders://` | ✅ Preview | For early adopters |
-| **Antigravity** | `antigravity://` | ✅ Supported | Full support |
-| **Cursor** | `cursor://` | ✅ AI-First | AI Code Editor |
-| **Windsurf** | `windsurf://` | ✅ Codeium | Codeium Integration |
+|-----|----------|:------:|-------|
+| VS Code | `vscode://` | ✅ | Standard Edition |
+| VS Code Insiders | `vscode-insiders://` | ✅ | Early adopter builds |
+| Cursor | `cursor://` | ✅ | AI-first code editor |
+| Windsurf | `windsurf://` | ✅ | Codeium integration |
+| Antigravity | `antigravity://` | ✅ | Full support |
 
 ---
 
-## 📦 Installation
+## Installation
 
 ### Option 1: Load Unpacked (Recommended)
 
-1. Download the [latest release](https://github.com/pingqLIN/IDE-Link-Interceptor/releases) or clone this repo.
-2. Go to `chrome://extensions/` (or `edge://extensions/`).
-3. Enable **Developer mode** (Top right corner).
-4. Click **Load unpacked** and select the `extension/` folder.
+```bash
+# 1. Download the latest release
+https://github.com/pingqLIN/IDEPicker/releases
+
+# 2. Open browser extensions page
+chrome://extensions/   # Chrome
+edge://extensions/     # Edge
+```
+
+3. Enable **Developer mode** (top right corner)
+4. Click **Load unpacked** and select the `extension/` folder
 
 ### Option 2: Build from Source
 
 ```bash
 # Clone the repository
-git clone [https://github.com/pingqLIN/IDE-Link-Interceptor.git](https://github.com/pingqLIN/IDE-Link-Interceptor.git)
-cd IDE-Link-Interceptor
+git clone https://github.com/pingqLIN/IDEPicker.git
+cd IDEPicker
 
-# Install dependencies & Validate
+# Install dependencies
 npm install
+
+# Validate the build
 npm run validate
 ```
 
 ---
 
-## 🚀 Usage Guide
+## Usage
 
-### 1. Extension Popup
-Click the extension icon <img src="extension/icons/logo.png" width="16" style="vertical-align:middle"> to select your default IDE. Your choice is saved automatically.
+### Extension Popup
 
-### 2. Context Menu
-Right-click on any link or page > Hover over **🔗 Select Target IDE**.
+Click the extension icon to select your default IDE. Your choice is saved automatically.
 
-### 3. Installing Extensions (VSIX / Marketplace)
-* **Marketplace**: Click "Install" on the VS Code Marketplace. IDEPicker will intercept and open it in your target IDE (e.g., Cursor).
-* **Direct Download**: Right-click a `.vsix` link > **📦 Install extension with [IDE Name]**.
+```
+Click Extension Icon → Select IDE → Done ✓
+```
 
-> [!NOTE]
-> **A Note on Security**: All VS Code-based IDEs require a second click *inside* the IDE to confirm installation. This is a platform security feature, not a bug.
+### Context Menu
 
----
+Right-click on any link or page → Hover over **🔗 Select Target IDE**
 
-## 🧪 Playground (Try it out)
+### Installing Extensions
 
-Test the interception capabilities with these live links:
+| Source | How to Use |
+|--------|------------|
+| **Marketplace** | Click "Install" on VS Code Marketplace — IDEPicker intercepts and opens in your target IDE |
+| **VSIX Files** | Right-click `.vsix` link → **📦 Install extension with [IDE Name]** |
 
-| Type | Test Action |
-|:---|:---|
-| **MCP Server** | [Install GitHub MCP](https://github.com/mcp) |
-| **Extension** | [Install Python (Marketplace)](https://marketplace.visualstudio.com/items?itemName=ms-python.python) |
-| **Download** | [Download Open VSX (.vsix)](https://open-vsx.org/) |
-
-> [!TIP]
-> **Protocol Conversion Example**:
-> If you select **Cursor** as your IDE, clicking a `vscode:extension/ms-python.python` link will automatically convert to `cursor:extension/ms-python.python`.
+> **Note:** All VS Code-based IDEs require a second confirmation click inside the IDE for security.
 
 ---
 
-## 🛠️ Development
+## Playground
+
+Test the interception capabilities:
+
+| Type | Action |
+|------|--------|
+| MCP Server | [Install GitHub MCP](https://github.com/mcp) |
+| Extension | [Install Python Extension](https://marketplace.visualstudio.com/items?itemName=ms-python.python) |
+| VSIX Download | [Browse Open VSX](https://open-vsx.org/) |
+
+> **Tip:** When Cursor is selected, `vscode:extension/ms-python.python` automatically converts to `cursor:extension/ms-python.python`
+
+---
+
+## Development
 
 ### Project Structure
-```text
-IDE-Link-Interceptor/
-├── extension/          # Browser extension source (MV3)
-│   ├── background.js   # Service worker
-│   ├── content.js      # Content script
-│   └── popup/          # UI Logic
-├── native-host/        # Native messaging host
-└── scripts/            # Build & utility scripts
+
+```
+IDEPicker/
+├── extension/              # Browser extension source (MV3)
+│   ├── background.js       # Service worker
+│   ├── content.js          # Content script
+│   ├── popup/              # Popup UI
+│   └── icons/              # Extension icons
+├── native-host/            # Native messaging host
+├── scripts/                # Build & utility scripts
+└── docs/                   # Documentation & screenshots
 ```
 
-### Commands
+### Available Commands
+
+| Command | Description |
+|---------|-------------|
+| `npm run lint` | Run ESLint code analysis |
+| `npm run lint:fix` | Auto-fix code style issues |
+| `npm run validate` | Validate extension build |
+| `npm run package` | Package extension for release |
+
+### Tech Stack
+
+| Component | Technology |
+|-----------|------------|
+| Extension | Chrome Manifest V3 |
+| Language | JavaScript (67.3%) |
+| UI | HTML/CSS |
+| Build | npm scripts |
+
+---
+
+## Contributing
+
+Contributions are welcome! Here's how you can help:
+
+| Type | Link |
+|------|------|
+| 🐛 Report Bug | [Open Issue](https://github.com/pingqLIN/IDEPicker/issues) |
+| 💡 Request Feature | [Open Issue](https://github.com/pingqLIN/IDEPicker/issues) |
+| 📝 Improve Docs | Submit a PR |
+| 🔧 Submit Code | Fork → Branch → PR |
+
+### Development Flow
+
 ```bash
-npm run lint      # Run ESLint
-npm run lint:fix  # Auto-fix code style
-npm run package   # Package extension for release
+# Fork and clone
+git clone https://github.com/YOUR_USERNAME/IDEPicker.git
+
+# Create feature branch
+git checkout -b feature/amazing-feature
+
+# Make changes and commit
+git commit -m "feat: add amazing feature"
+
+# Push and create PR
+git push origin feature/amazing-feature
 ```
 
 ---
 
-## 🤝 Contributing & License
+## License
 
-Contributions are welcome! Please open an issue or submit a PR.
-Distributed under the **MIT License**.
+Distributed under the [MIT License](LICENSE).
 
-<div align="center">
-<br>
+---
 
-**Made with ❤️ for developers who multitask across IDEs.**
+<p align="center">
+  <strong>Made with ❤️ for developers who multitask across IDEs.</strong>
+</p>
 
-[⬆ Back to top](#idepicker)
-</div>
+<p align="center">
+  <a href="#idepicker">⬆ Back to Top</a>
+</p>
