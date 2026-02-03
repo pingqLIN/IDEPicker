@@ -179,7 +179,7 @@ Test these direct extension installation links to verify protocol conversion:
 
 | Target IDE | Input | Expected Output |
 |:---|:---|:---|
-| Antigravity | `vscode:extension/ms-python.python` | `antigravity://extension/ms-python.python` |
+| Antigravity | `vscode:extension/ms-python.python` | `antigravity://ms-python.python` |
 | Cursor | `vscode:extension/ms-python.python` | `cursor:extension/ms-python.python` |
 | VS Code | `cursor:extension/ms-python.python` | `vscode:extension/ms-python.python` |
 | Antigravity | `vscode://file/path` | `antigravity://file/path` |
